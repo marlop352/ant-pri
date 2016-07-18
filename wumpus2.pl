@@ -77,6 +77,7 @@ restart([Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
   glitter(Glitter),
   nl_hint(NLHint),
   generate_image(Image),
+  print_image(Image),
   display_action(restart,NLHint).
 
 
@@ -274,6 +275,7 @@ execute(goforward,[Stench,Breeze,Glitter,Bump,no,NLHint,Image]) :-
   glitter(Glitter),
   nl_hint(NLHint),
   generate_image(Image),
+  print_image(Image),
   display_action(goforward,NLHint).
 
 execute(turnleft,[Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
@@ -287,6 +289,7 @@ execute(turnleft,[Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
   glitter(Glitter),
   nl_hint(NLHint),
   generate_image(Image),
+  print_image(Image),
   display_action(turnleft,NLHint).
 
 execute(turnright,[Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
@@ -300,6 +303,7 @@ execute(turnright,[Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
   glitter(Glitter),
   nl_hint(NLHint),
   generate_image(Image),
+  print_image(Image),
   display_action(turnright,NLHint).
 
 execute(grab,[Stench,Breeze,no,no,no,NLHint,Image]) :-
@@ -309,6 +313,7 @@ execute(grab,[Stench,Breeze,no,no,no,NLHint,Image]) :-
   breeze(Breeze),
   nl_hint(NLHint),
   generate_image(Image),
+  print_image(Image),
   display_action(grab,NLHint).
 
 execute(shoot,[Stench,Breeze,Glitter,no,Scream,NLHint,Image]) :-
@@ -319,6 +324,7 @@ execute(shoot,[Stench,Breeze,Glitter,no,Scream,NLHint,Image]) :-
   glitter(Glitter),
   nl_hint(NLHint),
   generate_image(Image),
+  print_image(Image),
   display_action(shoot,NLHint).
 
 execute(climb,[no,no,no,no,no,[],[]]) :-  % climb works
@@ -340,6 +346,7 @@ execute(climb,[Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
   glitter(Glitter),
   nl_hint(NLHint),
   generate_image(Image),
+  print_image(Image),
   display_action(climb,NLHint),
   format("You cannot leave the cave from here.~n",[]).
 
