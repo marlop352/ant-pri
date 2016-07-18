@@ -15,6 +15,10 @@
 %
 % Loaded from: wumpus2.pl
 
+conc([],L,L).
+
+conc([H|T],L1,[H|L2]) :-
+  conc(T,L1,L2).
 
 image_dimen(25).     % Dimension of square image (NxN).
 
