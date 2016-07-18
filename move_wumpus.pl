@@ -67,7 +67,7 @@ execute_wumpus_action(nil).
 % List of names of available wumpus movement rules.
 
 wumpus_movement_rules([
-  sit,
+  sit%,
 %  spin,
 %  random,
 %  bump_turn,

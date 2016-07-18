@@ -2,7 +2,7 @@
 
 :- op(500,fx,not).
 
-not(P) :- P, !, fail ; true.
+%not(P) :- P, !, fail ; true.
 
 
 member(X,[X|_]).
