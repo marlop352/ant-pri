@@ -11,16 +11,13 @@
 %
 % See comments on the following interface procedures:
 %
-%   evaluate_agent(Trials,Score,Time)
-%   evaluate_agent2(Trials,Score,Time)
 %   initialize(World,Percept)
 %   restart(Percept)
+%
 
 :- load_files([
   library(random),   % Quintus Prolog's random library
-  math,              % My own math library (couldn't load Quintus')
-  utils,             % Basic utilities
-  image,             % Image percept generation
+  image             % Image percept generation
   ]).
 
 :- dynamic([
@@ -127,7 +124,7 @@ initialize_world(random) :-
   gold_probability(PG),             % place gold
   place_objects(gold,PG,AllSqrs),
   at_least_one_gold(4),
-  del([1,1],AllSqrs,AllSqrs1),
+  delete(AllSqrs,[1,1],AllSqrs1),
   pit_probability(PP),              % place pits
   place_objects(pit,PP,AllSqrs1),
   random_member([WX,WY],AllSqrs1),  % initialize wumpus
