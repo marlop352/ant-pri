@@ -5,8 +5,6 @@
 % A Prolog implementation of the Wumpus world described in Russell and
 % Norvig's "Artificial Intelligence: A Modern Approach", Section 6.2.
 % A few enhancements have been added:
-%   - the wumpus can move according to simple rules (e.g., move towards the
-%     gold location)
 %   - the percept includes a binary image of the square the agent is
 %     facing containing bitmaps of a wumpus, gold and/or pit
 %   - the percept includes a natural language "hint"
@@ -24,7 +22,6 @@
   math,              % My own math library (couldn't load Quintus')
   utils,             % Basic utilities
   image,             % Image percept generation
-  move_wumpus,       % Wumpus movement
   nl_hint            % Natural language hint percept generation
   ]).
 
@@ -33,9 +30,6 @@
   wumpus_world_extent/1,
   wumpus_location/2,
   wumpus_health/1,
-  wumpus_orientation/1,
-  wumpus_last_action/1,
-  wumpus_movement_rule/1,
   gold/2,
   pit/2,
   agent_location/2,
@@ -97,9 +91,6 @@ restart([Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
 %   Wumpus Location: The initial wumpus location is chosen at random
 %                    anywhere in the cave except location (1,1).
 %
-%   Wumpus Movement: A wumpus-movement rule is chosen at random and
-%                    is fixed until a new world is generated.
-%
 %   Pit Location: Each square has a pit with probability P set by
 %                 pit_probability(P), except location (1,1), which
 %                 will never have a pit.
@@ -110,12 +101,8 @@ restart([Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
 %
 % wumpus_world_extent(E): defines world to be E by E
 % wumpus_location(X,Y): the Wumpus is in square X,Y
-% wumpus_orientation(A): one of {0,90,180,270), initially 0.
 % wumpus_health(H): H is 'dead' or 'alive'
-% wumpus_last_action(A): one of {nil,goforward,turnleft,turnright},
 %                        initially nil.
-% wumpus_movement_rule(R): R is a randomly-selected rule from
-%                          wumpus_movement_rules(Rules) 
 % gold(X,Y): there is gold in square X,Y
 % pit(X,Y): there is a pit in square X,Y
 
@@ -125,12 +112,7 @@ initialize_world(fig62) :-
   assert(ww_initial_state([])),
   addto_ww_init_state(wumpus_world_extent(4)),
   addto_ww_init_state(wumpus_location(1,3)),
-  addto_ww_init_state(wumpus_orientation(0)),
   addto_ww_init_state(wumpus_health(alive)),
-  addto_ww_init_state(wumpus_last_action(nil)),
-  wumpus_movement_rules(Rules),
-  random_member(Rule,Rules),
-  addto_ww_init_state(wumpus_movement_rule(Rule)),
   addto_ww_init_state(gold(2,3)),
   addto_ww_init_state(pit(3,1)),
   addto_ww_init_state(pit(3,3)),
@@ -152,12 +134,7 @@ initialize_world(random) :-
   place_objects(pit,PP,AllSqrs1),
   random_member([WX,WY],AllSqrs1),  % initialize wumpus
   addto_ww_init_state(wumpus_location(WX,WY)),
-  addto_ww_init_state(wumpus_orientation(0)),
   addto_ww_init_state(wumpus_health(alive)),
-  addto_ww_init_state(wumpus_last_action(nil)),
-  wumpus_movement_rules(Rules),
-  random_member(Rule,Rules),
-  addto_ww_init_state(wumpus_movement_rule(Rule)),
   ww_initial_state(L),
   assert_list(L).
 
@@ -188,10 +165,7 @@ initialize_agent :-
 ww_retractall :-
   retractall(wumpus_world_extent(_)),
   retractall(wumpus_location(_,_)),
-  retractall(wumpus_orientation(_)),
   retractall(wumpus_health(_)),
-  retractall(wumpus_last_action(_)),
-  retractall(wumpus_movement_rule(_)),
   retractall(gold(_,_)),
   retractall(pit(_,_)).
 
@@ -294,7 +268,6 @@ execute(_,[no,no,no,no,no,[],[]]) :-
 execute(goforward,[Stench,Breeze,Glitter,Bump,no,NLHint,Image]) :-
   decrement_score,
   goforward(Bump),        % update location and check for bump
-  move_wumpus,
   update_agent_health,    % check for wumpus or pit
   stench(Stench),         % update rest of percept
   breeze(Breeze),
@@ -309,7 +282,6 @@ execute(turnleft,[Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
   NewAngle is (Angle + 90) mod 360,
   retract(agent_orientation(Angle)),
   assert(agent_orientation(NewAngle)),
-  move_wumpus,
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
@@ -323,7 +295,6 @@ execute(turnright,[Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
   NewAngle is (Angle + 270) mod 360,
   retract(agent_orientation(Angle)),
   assert(agent_orientation(NewAngle)),
-  move_wumpus,
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
@@ -334,7 +305,6 @@ execute(turnright,[Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
 execute(grab,[Stench,Breeze,no,no,no,NLHint,Image]) :-
   decrement_score,
   get_the_gold,
-  move_wumpus,
   stench(Stench),
   breeze(Breeze),
   nl_hint(NLHint),
@@ -344,7 +314,6 @@ execute(grab,[Stench,Breeze,no,no,no,NLHint,Image]) :-
 execute(shoot,[Stench,Breeze,Glitter,no,Scream,NLHint,Image]) :-
   decrement_score,
   shoot_arrow(Scream),
-  move_wumpus,  % wumpus will move only if alive
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
@@ -352,7 +321,7 @@ execute(shoot,[Stench,Breeze,Glitter,no,Scream,NLHint,Image]) :-
   generate_image(Image),
   display_action(shoot,NLHint).
 
-execute(climb,[no,no,no,no,no,[],[]]) :-  % climb works, no wumpus movement
+execute(climb,[no,no,no,no,no,[],[]]) :-  % climb works
   agent_location(1,1), !,
   decrement_score,
   agent_gold(G),
@@ -366,7 +335,6 @@ execute(climb,[no,no,no,no,no,[],[]]) :-  % climb works, no wumpus movement
 
 execute(climb,[Stench,Breeze,Glitter,no,no,NLHint,Image]) :-
   decrement_score,
-  move_wumpus,
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
@@ -582,18 +550,12 @@ display_world :-
   nl,
   wumpus_world_extent(E),
   display_rows(E,E),
-  wumpus_orientation(WA),
   wumpus_health(WH),
-  wumpus_last_action(WAct),
-  wumpus_movement_rule(Rule),
   agent_orientation(AA),
   agent_health(AH),
   agent_arrows(N),
   agent_gold(G),
-  format('wumpus_orientation(~d)~n',[WA]),
   format('wumpus_health(~w)~n',[WH]),
-  format('wumpus_last_action(~w)~n',[WAct]),
-  format('wumpus_movement_rule(~w)~n',[Rule]),
   format('agent_orientation(~d)~n',[AA]),
   format('agent_health(~w)~n',[AH]),
   format('agent_arrows(~d)~n',[N]),
