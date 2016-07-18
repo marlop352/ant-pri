@@ -1,0 +1,60 @@
+Wumpus World Simulator v2.3
+
+This version of the wumpus-world simulator adds a natural language
+hint and an image to each percept.  This simulator also allows the
+wumpus to move based on a randomly-selected rule.  Below is a
+description of the files involved.  See comments in the files for
+details.  Loading wumpus2.pl will load the other files (except
+navigate.pl and wumpus1.pl).
+
+
+wumpus2.pl       New wumpus-world simulator.  Contains the random
+                 wumpus-world generator, and the procedure
+                 evaluate_agent(Trials,Score,Time) which calls an
+                 externally-defined agent.  Note that the procedure
+                 intialize(W,P) now takes two arguments, in case you
+                 want to use it for testing.  Also included is a
+                 wumpus world displayer (display_world).
+
+nl_hint.pl       Code for generating a random sentence describing some
+                 aspect of the wumpus world.
+
+image.pl         Code for generating a binary image of the square faced
+                 by the agent.  The image contains bitmaps of the wumpus,
+                 pit and/or gold.
+
+move_wumpus.pl   Rules for performing wumpus movement.
+
+navigate.pl      Outline of navigate(Actions,Score,Time) procedure to
+                 be defined within agent and called by evaluate_agent2
+                 within wumpus2.pl.
+
+agents.pl        Sample definitions of some simple agents for testing.
+
+math.pl          My own code for doing logarithms and inverse tangent,
+                 because the Quintus Prolog math library will not load
+                 correctly.
+
+utils.pl         Basic utilities.
+
+wumpus1.pl       Previous version of the wumpus-world simulator.
+
+
+
+Changes v2.2 to v2.3:
+
+  Added max_agent_tries(10) to wumpus2.pl.
+  Added evaluate_agent2 to wumpus2.pl which calls navigate(Actions,Score,Time)
+    to be defined within agent.
+  Added file navigate.pl containing outline of navigate(Actions,Score,Time)
+    procedure.
+  Added file agents.pl containing sample agent definitions to work with
+    the navigate.pl code.
+  Changed 'delete' predicate to 'del' to avoid conflicts with Quintus
+    list library.
+  Fixed at_least_one_gold/1 to correctly detect existing gold pieces.
+
+Changes v2.1 to v2.2:
+
+  Fixed bugs in image.pl and wumpus2.pl.
+  Added cos(X,Y) and sin(X,Y) to math.pl.

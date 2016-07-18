@@ -1,0 +1,68 @@
+% Interactive Binary Dictionary
+%
+% tree_init(Tree): Initializes an empty binary dictionary tree called Tree.
+% tree_insert(Tree,X): Insert X into Tree.
+% tree_delete(Tree,X): Delete X from Tree.
+% tree_search(Tree,X): True if X is in Tree.
+% tree_print(Tree): Outputs Tree sideways.
+% tree_destroy(Tree): Removes Tree from the database.
+
+:- op(700,xfx,'$<').
+
+:- load_files(['/home/public/cse/5360/code/holder/utils',
+               '/home/public/cse/5360/code/bratko/fig9.7',
+               '/home/public/cse/5360/code/bratko/fig9.10',
+               '/home/public/cse/5360/code/bratko/fig9.13',
+               '/home/public/cse/5360/code/bratko/fig9.17']).
+
+tree_init(Tree) :-
+  assert(tree(Tree,nil)).
+
+tree_insert(Tree,X) :-
+  tree(Tree,T1),
+  retract(tree(Tree,_)),
+  addleaf(T1,X,T2),        % Code from Figure 9.10
+  assert(tree(Tree,T2)).
+
+tree_delete(Tree,X) :-
+  tree(Tree,T1),
+  retract(tree(Tree,_)),
+  del(T1,X,T2),            % Code from Figure 9.13
+  assert(tree(Tree,T2)).
+
+tree_search(Tree,X) :-
+  tree(Tree,T1),
+  in(X,T1).                % Code from Figure 9.7
+
+tree_print(Tree) :-
+  tree(Tree,T1),
+  write(Tree),
+  write(': '), nl, nl,
+  show(T1).                % Code from Figure 9.17
+
+tree_destroy(Tree) :-
+  retract(tree(Tree,_)).
+
+% atom_lt(A1,A2): less than for atoms (assumes lower case)
+%                 similar to '@<' in Quintus
+
+'$<'(A1,A2) :-
+  atom_lt(A1,A2).
+
+atom_lt(A1,A2) :-
+  name(A1,L1),
+  name(A2,L2),
+  atomic_less_than(L1,L2).
+
+atomic_less_than([],_).    % aaa <= aaa...
+
+atomic_less_than([X|_],[Y|_]) :-
+  X < Y.
+
+atomic_less_than([X|T1],[X|T2]) :-
+  atomic_less_than(T1,T2).
+
+% define gt(X,Y) for use in Bratko's binary dictionary code
+
+gt(X,Y) :- not (X $< Y).
+
