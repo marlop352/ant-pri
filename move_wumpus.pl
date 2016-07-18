@@ -68,12 +68,12 @@ execute_wumpus_action(nil).
 
 wumpus_movement_rules([
   sit,
-  spin,
-  random,
-  bump_turn,
-  loop,
-  goto_gold,
-  goto_pit
+%  spin,
+%  random,
+%  bump_turn,
+%  loop,
+%  goto_gold,
+%  goto_pit
   ]).
 
 % wumpus_movement_rule(Rule,Action):  Uses wumpus movement Rule to
