@@ -2,13 +2,11 @@
 %
 % Based on the agent's current location and orientation, generate an image
 % of what's in the square the agent is facing.  The image will be binary,
-% NxN as controlled by image_dimen(N), and will always have some noise
-% (probability P of a pixel value being flipped) as controlled by
-% image_noise(P).
+% NxN as controlled by image_dimen(N).
 %
-% If the agent is facing a wall, then the image is all ones (plus noise).
-% If the agent is facing an empty square, the image is all zeros (plus
-% noise).  If there is gold, a pit, or a live wumpus in the facing square,
+% If the agent is facing a wall, then the image is all ones.
+% If the agent is facing an empty square, the image is all zeros.
+% If there is gold, a pit, or a live wumpus in the facing square,
 % then the appropriate bitmap is placed somewhere in the image rotated by
 % 0, 90, 180 or 270 degrees.  The bitmaps will always be non-overlapping.
 %
@@ -19,7 +17,6 @@
 
 
 image_dimen(25).     % Dimension of square image (NxN).
-image_noise(0.01).   % Probability of an image pixel being inverted.
 
 % Placement of bitmaps within a 25x25 binary image, depending on which
 % items are present in the scene.
@@ -65,8 +62,7 @@ print_image_row([1|Cols]) :-
 
 % generate_points(X,Y,Points,Image):  If (X,Y) is off world, then all pixels
 %   are black (1).  Otherwise, every point in Points is set to black (1) in
-%   the image, and all others are white (0).  In either case, each pixel is
-%   inverted with probability P from image_noise(P).
+%   the image, and all others are white (0).
 
 generate_points(X,Y,Points,Image) :-
   detect_wall(X,Y,Wall),
@@ -87,7 +83,7 @@ detect_wall(_,_,false).
 
 % generate_image_rows(Wall,Points,RowNum,Rows):  Generates the rows of
 %   binary-valued pixels by including any points in Points or a row of
-%   all 1's if Wall=true.  Noise is added in either case.
+%   all 1's if Wall=true.
 
 generate_image_rows(_,_,0,[]) :- !.
 
@@ -102,36 +98,19 @@ generate_image_row(_,_,_,ColNum,[]) :-
   ColNum > MaxCol,
   !.
 
-generate_image_row(true,_,_,ColNum,[Pixel|Cols]) :-
-  add_noise(1,Pixel),
+generate_image_row(true,_,_,ColNum,[1|Cols]) :-
   ColNum1 is ColNum + 1,
   generate_image_row(true,_,_,ColNum1,Cols).
 
-generate_image_row(false,Points,RowNum,ColNum,[Pixel|Cols]) :-
+generate_image_row(false,Points,RowNum,ColNum,[1|Cols]) :-
   member([ColNum,RowNum],Points),
   !,
-  add_noise(1,Pixel),
   ColNum1 is ColNum + 1,
   generate_image_row(false,Points,RowNum,ColNum1,Cols).
 
-generate_image_row(false,Points,RowNum,ColNum,[Pixel|Cols]) :-
-  add_noise(0,Pixel),
+generate_image_row(false,Points,RowNum,ColNum,[0|Cols]) :-
   ColNum1 is ColNum + 1,
   generate_image_row(false,Points,RowNum,ColNum1,Cols).
-
-
-% add_noise(Pixel1,Pixel2): Given image_noise(P), Pixel2 = flip(Pixel1)
-%   with probability P; otherwise, Pixel2 = Pixel1.
-
-add_noise(Pixel1,Pixel2) :-
-  image_noise(P),
-  random(R),
-  R < P,
-  !,
-  ( Pixel1 = 0, Pixel2 = 1 ;
-    Pixel1 = 1, Pixel2 = 0 ).
-
-add_noise(Pixel,Pixel).
 
 
 % place_gold_bitmap(X,Y,GSide,GoldPoints): Choose a random side GSide
