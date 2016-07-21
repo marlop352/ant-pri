@@ -6,10 +6,11 @@
 % Norvig's "Artificial Intelligence: A Modern Approach", Section 6.2.
 % A few enhancements have been added:
 %   - random wumpus world generator
+%	- random wumpus world generator can use a arbitrary size
 %
 % See comments on the following interface procedures:
 %
-%   initialize(World,Percept)
+%   initialize(World,Percept[,Size])
 %   restart(Percept)
 %
 
