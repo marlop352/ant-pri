@@ -13,9 +13,6 @@
 %   restart(Percept)
 %
 
-%:- load_files([
-%  library(random)   % Quintus Prolog's random library
-%  ]).
 
 :- dynamic
   ww_initial_state/1,
@@ -35,8 +32,6 @@
 
 gold_probability(0.10).  % Probability that a location has gold
 pit_probability(0.20).   % Probability that a non-(1,1) location has a pit
-max_agent_actions(64).   % Maximum actions per trial allowed by agent
-max_agent_tries(10).     % Maximum agent tries (climb or die) per world
 
 
 % initialize(World,Percept): initializes the Wumpus world and our fearless
@@ -314,7 +309,7 @@ execute(climb,[Stench,Breeze,Glitter,no,no]) :-
   display_action(climb),
   format("You cannot leave the cave from here.~n",[]).
 
-
+  
 % decrement_score: subtracts one from agent_score for each move
 
 decrement_score :-
