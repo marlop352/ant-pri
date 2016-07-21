@@ -29,18 +29,26 @@
   agent_arrows/1,
   agent_score/1.
 
-
+wumpus_world_default_extent(4).  % Default size of the cave is 4x4
 gold_probability(0.10).  % Probability that a location has gold
 pit_probability(0.20).   % Probability that a non-(1,1) location has a pit
 
 
-% initialize(World,Percept): initializes the Wumpus world and our fearless
+% initialize(World,Percept[,Size]): initializes the Wumpus world and our fearless
 %   agent according to the given World and returns the Percept from square
 %   1,1.  World can be either 'fig62' for Figure 6.2 of Russell and Norvig,
 %   or 'random' to generate a random world.
 
 initialize(World,[Stench,Breeze,Glitter,no,no]) :-
   initialize_world(World),
+  initialize_agent,
+  stench(Stench),
+  breeze(Breeze),
+  glitter(Glitter),
+  display_action(initialize).
+
+initialize(World,[Stench,Breeze,Glitter,no,no],Size) :-
+  initialize_world(World,Size),
   initialize_agent,
   stench(Stench),
   breeze(Breeze),
@@ -62,13 +70,16 @@ restart([Stench,Breeze,Glitter,no,no]) :-
   display_action(restart).
 
 
-% initialize_world(World): Initializes the Wumpus world.  World is either
+% initialize_world(World[,Size]): Initializes the Wumpus world.  World is either
 %   fig62, which generates the wumpus world in Figure 6.2 of [Russell &
 %   Norvig], or World=random, which generates a random world according to
 %   the following guidelines:
 %
-%   Size: The size of the wumpus world is fixed at 4x4, but can be set
-%         arbitrarily using different values for wumpus_world_extent(E).
+%   Size: The default size of the wumpus world is 4x4, but can be changed
+% 			by changing the value of wumpus_world_default_extent(Size).
+%			If Size is set it will be used, if not the default will be used.
+%			Size is only valid in the random world.
+%			
 %
 %   Wumpus Location: The initial wumpus location is chosen at random
 %                    anywhere in the cave except location (1,1).
@@ -103,14 +114,33 @@ initialize_world(fig62) :-
   assert_list(L).
 
 initialize_world(random) :-
+  wumpus_world_default_extent(WWS),
   ww_retractall,
   retractall(ww_initial_state(_)),
   assert(ww_initial_state([])),
-  addto_ww_init_state(wumpus_world_extent(4)),
-  all_squares(4,AllSqrs),
+  addto_ww_init_state(wumpus_world_extent(WWS)),
+  all_squares(WWS,AllSqrs),
   gold_probability(PG),             % place gold
   place_objects(gold,PG,AllSqrs),
-  at_least_one_gold(4),
+  at_least_one_gold(WWS),
+  delete(AllSqrs,[1,1],AllSqrs1),
+  pit_probability(PP),              % place pits
+  place_objects(pit,PP,AllSqrs1),
+  random_member([WX,WY],AllSqrs1),  % initialize wumpus
+  addto_ww_init_state(wumpus_location(WX,WY)),
+  addto_ww_init_state(wumpus_health(alive)),
+  ww_initial_state(L),
+  assert_list(L).
+
+initialize_world(random,Size) :-
+  ww_retractall,
+  retractall(ww_initial_state(_)),
+  assert(ww_initial_state([])),
+  addto_ww_init_state(wumpus_world_extent(Size)),
+  all_squares(Size,AllSqrs),
+  gold_probability(PG),             % place gold
+  place_objects(gold,PG,AllSqrs),
+  at_least_one_gold(Size),
   delete(AllSqrs,[1,1],AllSqrs1),
   pit_probability(PP),              % place pits
   place_objects(pit,PP,AllSqrs1),
