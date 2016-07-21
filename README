@@ -1,18 +1,10 @@
 Wumpus World Simulator v2.3
 
-This version of the wumpus-world simulator adds an image to each percept.  Below is a
-description of the files involved.  See comments in the files for
-details.  Loading wumpus2.pl will load the other files.
-
+Below is a description of the files involved.  See comments in the
+files for details. Loading wumpus2.pl will load the other files.
 
 wumpus2.pl       New wumpus-world simulator.  Contains the random
-                 wumpus-world generator, and the procedure
-                 evaluate_agent(Trials,Score,Time) which calls an
-                 externally-defined agent.  Note that the procedure
+                 wumpus-world generator.  Note that the procedure
                  intialize(W,P) now takes two arguments, in case you
                  want to use it for testing.  Also included is a
                  wumpus world displayer (display_world).
-
-image.pl         Code for generating a binary image of the square faced
-                 by the agent.  The image contains bitmaps of the wumpus,
-                 pit and/or gold.

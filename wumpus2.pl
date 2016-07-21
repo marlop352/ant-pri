@@ -5,8 +5,6 @@
 % A Prolog implementation of the Wumpus world described in Russell and
 % Norvig's "Artificial Intelligence: A Modern Approach", Section 6.2.
 % A few enhancements have been added:
-%   - the percept includes a binary image of the square the agent is
-%     facing containing bitmaps of a wumpus, gold and/or pit
 %   - random wumpus world generator
 %
 % See comments on the following interface procedures:
@@ -16,8 +14,7 @@
 %
 
 :- load_files([
-  library(random),   % Quintus Prolog's random library
-  image             % Image percept generation
+  library(random)   % Quintus Prolog's random library
   ]).
 
 :- dynamic([
@@ -48,21 +45,19 @@ max_agent_tries(10).     % Maximum agent tries (climb or die) per world
 %   1,1.  World can be either 'fig62' for Figure 6.2 of Russell and Norvig,
 %   or 'random' to generate a random world.
 
-initialize(World,[Stench,Breeze,Glitter,no,no,Image]) :-
+initialize(World,[Stench,Breeze,Glitter,no,no]) :-
   initialize_world(World),
   initialize_agent,
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
-  generate_image(Image),
-  print_image(Image),
   display_action(initialize).
 
 
 % restart(Percept): Restarts the current world from scratch and returns
 %   the initial Percept.
 
-restart([Stench,Breeze,Glitter,no,no,Image]) :-
+restart([Stench,Breeze,Glitter,no,no]) :-
   ww_retractall,
   ww_initial_state(L),
   assert_list(L),
@@ -70,8 +65,6 @@ restart([Stench,Breeze,Glitter,no,no,Image]) :-
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
-  generate_image(Image),
-  print_image(Image),
   display_action(restart).
 
 
@@ -245,31 +238,27 @@ at_least_one_gold(E) :-
 %     climb:     if in square 1,1, leaves the cave and adds 1000 points
 %                for each piece of gold
 %
-%   Percept = [Stench,Breeze,Glitter,Bump,Scream,Image]
-%             The first five are either 'yes' or 'no'. Image is a 25x25 binary
-%             image of the square or wall the agent is facing containing
-%             bitmaps of the wumpus, pit and/or gold.
+%   Percept = [Stench,Breeze,Glitter,Bump,Scream]
+%             The first five are either 'yes' or 'no'.
 
-execute(_,[no,no,no,no,no,[]]) :-
+execute(_,[no,no,no,no,no]) :-
   agent_health(dead), !,         % agent must be alive to execute actions
   format("You are dead!~n",[]).
 
-execute(_,[no,no,no,no,no,[]]) :-
+execute(_,[no,no,no,no,no]) :-
   agent_in_cave(no), !,         % agent must be in the cave
   format("You have left the cave.~n",[]).
 
-execute(goforward,[Stench,Breeze,Glitter,Bump,no,Image]) :-
+execute(goforward,[Stench,Breeze,Glitter,Bump,no]) :-
   decrement_score,
   goforward(Bump),        % update location and check for bump
   update_agent_health,    % check for wumpus or pit
   stench(Stench),         % update rest of percept
   breeze(Breeze),
   glitter(Glitter),
-  generate_image(Image),
-  print_image(Image),
   display_action(goforward).
 
-execute(turnleft,[Stench,Breeze,Glitter,no,no,Image]) :-
+execute(turnleft,[Stench,Breeze,Glitter,no,no]) :-
   decrement_score,
   agent_orientation(Angle),
   NewAngle is (Angle + 90) mod 360,
@@ -278,11 +267,9 @@ execute(turnleft,[Stench,Breeze,Glitter,no,no,Image]) :-
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
-  generate_image(Image),
-  print_image(Image),
   display_action(turnleft).
 
-execute(turnright,[Stench,Breeze,Glitter,no,no,Image]) :-
+execute(turnright,[Stench,Breeze,Glitter,no,no]) :-
   decrement_score,
   agent_orientation(Angle),
   NewAngle is (Angle + 270) mod 360,
@@ -291,30 +278,24 @@ execute(turnright,[Stench,Breeze,Glitter,no,no,Image]) :-
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
-  generate_image(Image),
-  print_image(Image),
   display_action(turnright).
 
-execute(grab,[Stench,Breeze,no,no,no,Image]) :-
+execute(grab,[Stench,Breeze,no,no,no]) :-
   decrement_score,
   get_the_gold,
   stench(Stench),
   breeze(Breeze),
-  generate_image(Image),
-  print_image(Image),
   display_action(grab).
 
-execute(shoot,[Stench,Breeze,Glitter,no,Scream,Image]) :-
+execute(shoot,[Stench,Breeze,Glitter,no,Scream]) :-
   decrement_score,
   shoot_arrow(Scream),
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
-  generate_image(Image),
-  print_image(Image),
   display_action(shoot).
 
-execute(climb,[no,no,no,no,no,[],[]]) :-  % climb works
+execute(climb,[no,no,no,no,no]) :-  % climb works
   agent_location(1,1), !,
   decrement_score,
   agent_gold(G),
@@ -326,13 +307,11 @@ execute(climb,[no,no,no,no,no,[],[]]) :-  % climb works
   display_action(climb),
   format("I am outta here.~n",[]).
 
-execute(climb,[Stench,Breeze,Glitter,no,no,Image]) :-
+execute(climb,[Stench,Breeze,Glitter,no,no]) :-
   decrement_score,
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
-  generate_image(Image),
-  print_image(Image),
   display_action(climb),
   format("You cannot leave the cave from here.~n",[]).
 
