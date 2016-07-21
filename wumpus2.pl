@@ -184,3 +184,8 @@ at_least_one_gold(E) :-
   addto_ww_init_state(gold(X,Y)).
 
   
+%execute.pl
+%score.pl
+%signals.pl
+%actions.pl
+  
