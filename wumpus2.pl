@@ -553,10 +553,15 @@ display_square(X,Y,E) :-
   display_square(X1,Y,E).
 
 display_info(X,Y) :-
-  display_location_fact(wumpus_location,X,Y,'W'),
-  display_location_fact(agent_location,X,Y,'A'),
+  agent_orientation(AO),
+  display_agent(AO,AC),
+  display_location_fact(agent_location,X,Y,AC),
+  display_location_fact(gold,X,Y,'G'),
   display_location_fact(pit,X,Y,'P'),
-  display_location_fact(gold,X,Y,'G').
+  wumpus_health(WH),
+  display_wumpus(WH,WC),
+  display_location_fact(wumpus_location,X,Y,WC).
+  
 
 display_location_fact(Functor,X,Y,Atom) :-
   Fact =.. [Functor,X,Y],
@@ -572,6 +577,19 @@ display_dashes(E) :-
   name('-',[Dash]),
   format('~*c~n',[RowLen,Dash]).
 
+%WNb
+%display_wumpus(Wumpus_Health,Wumpus_Char)
+
+display_wumpus(alive,'W').
+display_wumpus(dead, 'd').
+
+%display_agent(Agent_Orientation,Agent_Char)
+
+display_agent(  0,'>').
+display_agent( 90,'^').
+display_agent(180,'<').
+display_agent(270,'V').
+%WNe
 
 % display_action(Action): Updates display after Action taken and
 %   new percept generated.
