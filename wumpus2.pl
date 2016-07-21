@@ -243,15 +243,9 @@ place_objects(Object,P,[_|Squares]) :-
 % at_least_one_gold(Extent): Ensures that at least on gold piece is
 %   somewhere in the wumpus world.
 
-at_least_one_gold(_) :-
-  ww_initial_state(L),
-  member(gold(_,_),L),
-  !.
-
 at_least_one_gold(E) :-
-  E1 is E + 1,
-  random(1,E1,X),
-  random(1,E1,Y),
+  random_between(1,E,X),
+  (X == 1 *-> random_between(2,E,Y) ; random_between(1,E,Y)),
   addto_ww_init_state(gold(X,Y)).
 
 
