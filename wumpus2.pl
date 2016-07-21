@@ -1,6 +1,6 @@
-% Wumpus World Simulator v2.3
+% Wumpus World Simulator
 %
-% Written by Larry Holder (holder@cse.uta.edu)
+% Adapted from code written by Larry Holder (holder@cse.uta.edu)
 %
 % A Prolog implementation of the Wumpus world described in Russell and
 % Norvig's "Artificial Intelligence: A Modern Approach", Section 6.2.
@@ -13,11 +13,11 @@
 %   restart(Percept)
 %
 
-:- load_files([
-  library(random)   % Quintus Prolog's random library
-  ]).
+%:- load_files([
+%  library(random)   % Quintus Prolog's random library
+%  ]).
 
-:- dynamic([
+:- dynamic
   ww_initial_state/1,
   wumpus_world_extent/1,
   wumpus_location/2,
@@ -30,8 +30,7 @@
   agent_health/1,
   agent_gold/1,
   agent_arrows/1,
-  agent_score/1
-  ]).
+  agent_score/1.
 
 
 gold_probability(0.10).  % Probability that a location has gold
@@ -239,7 +238,7 @@ at_least_one_gold(E) :-
 %                for each piece of gold
 %
 %   Percept = [Stench,Breeze,Glitter,Bump,Scream]
-%             The first five are either 'yes' or 'no'.
+%             These variables are either 'yes' or 'no'.  
 
 execute(_,[no,no,no,no,no]) :-
   agent_health(dead), !,         % agent must be alive to execute actions
