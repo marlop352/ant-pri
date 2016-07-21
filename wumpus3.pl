@@ -219,14 +219,6 @@ at_least_one_gold(E,AllSqrs,AllSqrs,GRestSqrs) :-
 %WNe
   addto_ww_init_state(gold(X,Y)).
 
-% decrement_score: subtracts one from agent_score for each move
-
-decrement_score :-
-  retract(agent_score(S)),
-  S1 is S - 1,
-  assert(agent_score(S1)).
-
-
 % stench(Stench): Stench = yes if wumpus (dead or alive) is in a square
 %   directly up, down, left, or right of the current agent location.
 
