@@ -121,9 +121,52 @@ initialize_world(fig62) :-
   assert_list(L).
 
 
-%diff1.pl
+initialize_world(random) :-
+  wumpus_world_default_extent(WWS),
+  ww_retractall,
+  retractall(ww_initial_state(_)),
+  assert(ww_initial_state([])),
+  addto_ww_init_state(wumpus_world_extent(WWS)),
+  all_squares(WWS,AllSqrs),
+  delete(AllSqrs,[1,1],AllSqrs1),   % remove agent position from valid position list
+  
+  random_member([WX,WY],AllSqrs1),  % initialize wumpus
+  addto_ww_init_state(wumpus_location(WX,WY)),
+  addto_ww_init_state(wumpus_health(alive)),
+  delete(AllSqrs1,[WX,WY],AllSqrs2),	% remove wumpus position from valid position list
+  
+  gold_probability(PG),             % place gold
+  place_objects(gold,PG,AllSqrs2,GRestSqrs),
+  at_least_one_gold(AllSqrs2,GRestSqrs,PSqrs),
+  
+  pit_probability(PP),              % place pits
+  place_objects(pit,PP,PSqrs,_),
+  
+  ww_initial_state(L),
+  assert_list(L).
 
-%world.pl
+initialize_world(random,Size) :-
+  ww_retractall,
+  retractall(ww_initial_state(_)),
+  assert(ww_initial_state([])),
+  addto_ww_init_state(wumpus_world_extent(Size)),
+  all_squares(Size,AllSqrs),
+  delete(AllSqrs,[1,1],AllSqrs1),	% remove agent position from valid position list
+  
+  random_member([WX,WY],AllSqrs1),  % initialize wumpus
+  addto_ww_init_state(wumpus_location(WX,WY)),
+  addto_ww_init_state(wumpus_health(alive)),
+  delete(AllSqrs1,[WX,WY],AllSqrs2),	% remove wumpus position from valid position list
+  
+  gold_probability(PG),             % place gold
+  place_objects(gold,PG,AllSqrs2,GRestSqrs),
+  at_least_one_gold(AllSqrs2,GRestSqrs,PSqrs),
+  
+  pit_probability(PP),              % place pits
+  place_objects(pit,PP,PSqrs,_),
+  
+  ww_initial_state(L),
+  assert_list(L).
 
 
 % initialize_agent: agent is initially alive, destitute (except for one
@@ -193,7 +236,33 @@ all_squares_1(Extent,Row,Col,[[Row,Col]|RestSqrs]) :-
   all_squares_1(Extent,Row,Col1,RestSqrs).
 
 
-%object1.pl
+% place_objects(Object,P,Squares): For each square in Squares, place
+%   Object at square with probability P.
+
+place_objects(_,_,[],[]).
+
+place_objects(Object,P,[Square|Squares],RestSquares) :-
+  maybe(P),   % succeeds with probability P
+  !,
+  Fact =.. [Object|Square],
+  addto_ww_init_state(Fact),
+  place_objects(Object,P,Squares,RestSquares).
+
+place_objects(Object,P,[Square|Squares],[Square|RestSquares]) :-
+  place_objects(Object,P,Squares, RestSquares).
+
+
+% at_least_one_gold(AllSqrs,GRestSqrs,PSqrs):
+% Ensures that at least on gold piece is somewhere in the wumpus world
+
+at_least_one_gold(AllSqrs,GRestSqrs,GRestSqrs) :-
+  \+ AllSqrs=GRestSqrs,
+  !.
+
+at_least_one_gold(AllSqrs,AllSqrs,GRestSqrs) :-
+  random_member([GX,GY],AllSqrs),  % initialize gold
+  delete(AllSqrs,[GX,GY],GRestSqrs),
+  addto_ww_init_state(gold(GX,GY)).
 
 
 %------------------------------------------------------------------------
