@@ -122,12 +122,12 @@ initialize_world(fig62) :-
 
 
 initialize_world(random) :-
-  wumpus_world_default_extent(WWS),
+  wumpus_world_default_extent(Size),
   ww_retractall,
   retractall(ww_initial_state(_)),
   assert(ww_initial_state([])),
-  addto_ww_init_state(wumpus_world_extent(WWS)),
-  all_squares(WWS,AllSqrs),
+  addto_ww_init_state(wumpus_world_extent(Size)),
+  all_squares(Size,AllSqrs),
   delete(AllSqrs,[1,1],AllSqrs1),   % remove agent position from valid position list
   
   random_member([WX,WY],AllSqrs1),  % initialize wumpus
@@ -137,10 +137,11 @@ initialize_world(random) :-
   
   gold_probability(PG),             % place gold
   place_objects(gold,PG,AllSqrs2,GRestSqrs),
-  at_least_one_gold(AllSqrs2,GRestSqrs,PSqrs),
+  at_least_one_object(gold,AllSqrs2,GRestSqrs,PSqrs),
   
   pit_probability(PP),              % place pits
-  place_objects(pit,PP,PSqrs,_),
+  place_objects(pit,PP,PSqrs,PRestSqrs),
+  at_least_one_object(pit,PSqrs,PRestSqrs,_),
   
   ww_initial_state(L),
   assert_list(L).
@@ -160,10 +161,11 @@ initialize_world(random,Size) :-
   
   gold_probability(PG),             % place gold
   place_objects(gold,PG,AllSqrs2,GRestSqrs),
-  at_least_one_gold(AllSqrs2,GRestSqrs,PSqrs),
+  at_least_one_object(gold,AllSqrs2,GRestSqrs,PSqrs),
   
   pit_probability(PP),              % place pits
-  place_objects(pit,PP,PSqrs,_),
+  place_objects(pit,PP,PSqrs,PRestSqrs),
+  at_least_one_object(pit,PSqrs,PRestSqrs,_),
   
   ww_initial_state(L),
   assert_list(L).
@@ -252,17 +254,18 @@ place_objects(Object,P,[Square|Squares],[Square|RestSquares]) :-
   place_objects(Object,P,Squares, RestSquares).
 
 
-% at_least_one_gold(AllSqrs,GRestSqrs,PSqrs):
-% Ensures that at least on gold piece is somewhere in the wumpus world
+% at_least_one_object(Object,AllSqrs,ORestSqrs,RSqrs):
+% Ensures that at least one Object is somewhere in the wumpus world
 
-at_least_one_gold(AllSqrs,GRestSqrs,GRestSqrs) :-
-  \+ AllSqrs=GRestSqrs,
+at_least_one_object(_,AllSqrs,ORestSqrs,ORestSqrs) :-
+  \+ AllSqrs=ORestSqrs,
   !.
 
-at_least_one_gold(AllSqrs,AllSqrs,GRestSqrs) :-
-  random_member([GX,GY],AllSqrs),  % initialize gold
-  delete(AllSqrs,[GX,GY],GRestSqrs),
-  addto_ww_init_state(gold(GX,GY)).
+at_least_one_object(Object,AllSqrs,AllSqrs,ORestSqrs) :-
+  random_member([OX,OY],AllSqrs),  % initialize gold
+  Fact =.. [Object|[OX,OY]],
+  delete(AllSqrs,[OX,OY],ORestSqrs),
+  addto_ww_init_state(Fact).
 
 
 %------------------------------------------------------------------------
