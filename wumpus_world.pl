@@ -1,6 +1,6 @@
 % wumpus_world.pl
 
-:- module(wumpus,[initialize/2, execute/2, display_world/0]).
+:- module(wumpus,[initialize/2, initialize/3, execute/2, display_world/0, restart/1]).
 
 % Wumpus World Simulator
 %
