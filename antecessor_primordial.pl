@@ -41,21 +41,19 @@ gold_probability(0.10).  % Probability that a location has gold
 pit_probability(0.20).   % Probability that a non-(1,1) location has a pit
 
 
-% initialize(World,Percept[,Size]): initializes the Wumpus world and our fearless
-%   agent according to the given World and returns the Percept from square
-%   1,1.  World can be either 'fig62' for Figure 6.2 of Russell and Norvig,
-%   or 'random' to generate a random world.
+% initialize(Percept[,Size]): initializes the Wumpus world and our fearless
+%   agent and returns the Percept from square 1,1.
 
-initialize(World,[Stench,Breeze,Glitter,no,no]) :-
-  initialize_world(World),
+initialize([Stench,Breeze,Glitter,no,no]) :-
+  initialize_world(),
   initialize_agent,
   stench(Stench),
   breeze(Breeze),
   glitter(Glitter),
   display_action(initialize).
 
-initialize(World,[Stench,Breeze,Glitter,no,no],Size) :-
-  initialize_world(World,Size),
+initialize([Stench,Breeze,Glitter,no,no],Size) :-
+  initialize_world(Size),
   initialize_agent,
   stench(Stench),
   breeze(Breeze),
@@ -77,10 +75,8 @@ restart([Stench,Breeze,Glitter,no,no]) :-
   display_action(restart).
 
 
-% initialize_world(World[,Size]): Initializes the Wumpus world.  World is either
-%   fig62, which generates the wumpus world in Figure 6.2 of [Russell &
-%   Norvig], or World=random, which generates a random world according to
-%   the following guidelines:
+% initialize_world(Size): Initializes the Wumpus world.  Generates a
+%   random world according to the following guidelines:
 %
 %   Size: The default size of the wumpus world is 4x4, but can be changed
 % 			by changing the value of wumpus_world_default_extent(Size).
@@ -106,22 +102,7 @@ restart([Stench,Breeze,Glitter,no,no]) :-
 % gold(X,Y): there is gold in square X,Y
 % pit(X,Y): there is a pit in square X,Y
 
-initialize_world(fig62) :-
-  ww_retractall,
-  retractall(ww_initial_state(_)),
-  assert(ww_initial_state([])),
-  addto_ww_init_state(wumpus_world_extent(4)),
-  addto_ww_init_state(wumpus_location(1,3)),
-  addto_ww_init_state(wumpus_health(alive)),
-  addto_ww_init_state(gold(2,3)),
-  addto_ww_init_state(pit(3,1)),
-  addto_ww_init_state(pit(3,3)),
-  addto_ww_init_state(pit(4,4)),
-  ww_initial_state(L),
-  assert_list(L).
-
-
-initialize_world(random) :-
+initialize_world() :-
   wumpus_world_default_extent(Size),
   ww_retractall,
   retractall(ww_initial_state(_)),
@@ -146,7 +127,7 @@ initialize_world(random) :-
   ww_initial_state(L),
   assert_list(L).
 
-initialize_world(random,Size) :-
+initialize_world(Size) :-
   ww_retractall,
   retractall(ww_initial_state(_)),
   assert(ww_initial_state([])),
