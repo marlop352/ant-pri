@@ -3,7 +3,8 @@
 Um sistema/jogo de sobrevivência individual ou tribal de homens das cavernas, onde é gerado um mapa, com obstáculos como:
 
 	- Lobos.
-	- Inimigos Individuais ou em Tribos.
+	- Inimigos Individuais.
+	- Inimigos em Tribos.
 	- Precipício.
 	- Fome.
 	- Frio. 
