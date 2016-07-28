@@ -1,6 +1,6 @@
 % antecessor_primordial.pl
 
-:- module(anti_pri,[initialize/2, execute/2, display_world/0, restart/1]).
+%:- module(anti_pri,[initialize/2, execute/2, display_world/0, restart/1]).
 
 % Antecessor Primordial World Simulator
 %
