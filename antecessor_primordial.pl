@@ -59,10 +59,10 @@ fire_probability(0.10).   % Probability that a non-(1,1) location has fire
 food_probability(0.10).   % Probability that a non-(1,1) location has food
 
 
-% initialize(Percept[,Size]): initializes the Wumpus world and our fearless
-%   agent and returns the Percept from square 1,1.
+% initialize(Percept[,Size]): initializes the Antecessor Primordial World
+% and our fearless agent and returns the Percept from square 1,1.
 
-initialize([Stench,Breeze,Glitter,no,no]) :-
+initialize([Bark,Scream_enemy,Scream_tribe,Breeze,Freezing]) :-
   initialize_world(),
   initialize_agent,
   stench(Stench),
