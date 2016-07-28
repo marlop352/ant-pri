@@ -122,30 +122,12 @@ restart([Stench,Breeze,Glitter,no,no]) :-
 
 initialize_world() :-
   world_default_extent(Size),
-  world_retractall,
-  retractall(world_initial_state(_)),
-  assert(world_initial_state([])),
-  addto_world_init_state(world_extent(Size)),
-  all_squares(Size,AllSqrs),
-  delete(AllSqrs,[1,1],AllSqrs1),   % remove agent position from valid position list
-  
-  random_member([WX,WY],AllSqrs1),  % initialize wumpus
-  addto_world_init_state(wumpus_location(WX,WY)),
-  addto_world_init_state(wumpus_health(alive)),
-  delete(AllSqrs1,[WX,WY],AllSqrs2),	% remove wumpus position from valid position list
-  
-  gold_probability(PG),             % place gold
-  place_objects(gold,PG,AllSqrs2,GRestSqrs),
-  at_least_one_object(gold,AllSqrs2,GRestSqrs,PSqrs),
-  
-  pit_probability(PP),              % place pits
-  place_objects(pit,PP,PSqrs,PRestSqrs),
-  at_least_one_object(pit,PSqrs,PRestSqrs,_),
-  
-  world_initial_state(L),
-  assert_list(L).
+  initialize_world_generic(Size).
 
 initialize_world(Size) :-
+  initialize_world_generic(Size).
+
+initialize_world_generic(Size) :-
   world_retractall,
   retractall(world_initial_state(_)),
   assert(world_initial_state([])),
