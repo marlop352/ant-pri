@@ -13,13 +13,13 @@
   world_extent/1,
   
   tribe_amount/1,
-  tribe/5,
+  tribe/7,
   
   enemy_amount/1,
-  enemy/5,
+  enemy/7,
   
   wolf_amount/1,
-  wolf/2,
+  wolf/4,
   
   weapon_amount/1,
   weapon/2,
@@ -65,60 +65,62 @@ food_probability(0.10).   % Probability that a non-(1,1) location has food
 initialize([Bark,Scream_enemy,Scream_tribe,Breeze,Freezing]) :-
   initialize_world(),
   initialize_agent,
-  stench(Stench),
+  
+  bark(Bark),
+  scream_enemy(Scream_enemy),
+  scream_tribe(Scream_tribe),
   breeze(Breeze),
-  glitter(Glitter),
+  freezing(Freezing),
+  
   display_action(initialize).
 
-initialize([Stench,Breeze,Glitter,no,no],Size) :-
+initialize([Bark,Scream_enemy,Scream_tribe,Breeze,Freezing],Size) :-
   initialize_world(Size),
   initialize_agent,
-  stench(Stench),
+  
+  bark(Bark),
+  scream_enemy(Scream_enemy),
+  scream_tribe(Scream_tribe),
   breeze(Breeze),
-  glitter(Glitter),
+  freezing(Freezing),
+  
   display_action(initialize).
 
 
 % restart(Percept): Restarts the current world from scratch and returns
 %   the initial Percept.
 
-restart([Stench,Breeze,Glitter,no,no]) :-
+restart([Bark,Scream_enemy,Scream_tribe,Breeze,Freezing]) :-
   world_retractall,
   world_initial_state(L),
   assert_list(L),
   initialize_agent,
-  stench(Stench),
+  
+  bark(Bark),
+  scream_enemy(Scream_enemy),
+  scream_tribe(Scream_tribe),
   breeze(Breeze),
-  glitter(Glitter),
+  freezing(Freezing),
+  
   display_action(restart).
 
 
-% initialize_world(Size): Initializes the Wumpus world.  Generates a
-%   random world according to the following guidelines:
+% initialize_world(Size): Initializes the Antecessor Primordial world.
+%	Generates a random world according to the following guidelines:
 %
-%   Size: The default size of the wumpus world is 4x4, but can be changed
-% 			by changing the value of world_default_extent(Size).
-%			If Size is set it will be used, if not the default will be used.
-%			Size is only valid in the random world.
+%   Size: The default size of the Antecessor Primordial world is 10x10,
+%		but can be changed by changing the value of world_default_extent(Size).
+%		If Size is set it will be used, if not the default will be used.
 %			
 %
-%   Wumpus Location: The initial wumpus location is chosen at random
-%                    anywhere in the world except location (1,1).
-%
-%   Pit Location: Each square has a pit with probability P set by
-%                 pit_probability(P), except location (1,1), which
-%                 will never have a pit.
-%
-%   Gold Location: Each square has gold with probability P set by
-%                  gold_probability(P).  At least one square will have
-%                  gold; no more than one gold piece per square.
+%   Object Location: Each square has object with probability P set by
+%				object_probability(P), except location (1,1), which
+%				will never have object. At least one square will have
+%				object; no more than one object piece per square.
 %
 % world_extent(E): defines world to be E by E
-% wumpus_location(X,Y): the Wumpus is in square X,Y
-% wumpus_health(H): H is 'dead' or 'alive'
-%                        initially nil.
-% gold(X,Y): there is gold in square X,Y
-% pit(X,Y): there is a pit in square X,Y
+% enemy(ID,X,Y,Weapon,Fire,Food,Health): there is enemy in square X,Y
+% object(X,Y): there is object in square X,Y
 
 initialize_world() :-
   world_default_extent(Size),
