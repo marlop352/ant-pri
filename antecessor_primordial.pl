@@ -21,6 +21,14 @@
   fire/2,
   food/2,
   
+  signal_enemy_tribe_position/2,
+  signal_enemy_position/2,
+  signal_wolf_position/2,
+  signal_weapon_position/2,
+  signal_pit_position/2,
+  signal_fire_position/2,
+  signal_food_position/2,
+  
   agent_location/2,
   agent_orientation/1,
   agent_health/1,
@@ -179,6 +187,18 @@ world_retractall :-
   retractall(food(_,_)).
 
 
+% retractall_signal: Retract all Antecessor Primordial signal information.
+
+retractall_signal :-
+  retractall(signal_enemy_tribe_position(_,_)),
+  retractall(signal_enemy_position(_,_)),
+  retractall(signal_wolf_position(_,_)),
+  retractall(signal_weapon_position(_,_)),
+  retractall(signal_pit_position(_,_)),
+  retractall(signal_fire_position(_,_)),
+  retractall(signal_food_position(_,_)).
+  
+  
 % addto_world_init_state(Fact): Adds Fact to the list Internal_Map stored in
 %   world_initial_state(Internal_Map).
 
