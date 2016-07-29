@@ -31,14 +31,14 @@
   agent_score/1.
   
 
-world_default_extent(10). % Default size of the world is 10x10
+world_default_extent(10). 		% Default size of the world is 10x10
 enemy_tribe_probability(0.10).  % Probability that a non-(1,1) location has a enemy_tribe
-enemy_probability(0.10).  % Probability that a non-(1,1) location has an enemy
-wolf_probability(0.10).   % Probability that a non-(1,1) location has a wolf
-weapon_probability(0.10). % Probability that a non-(1,1) location has a weapon
-pit_probability(0.10).    % Probability that a non-(1,1) location has a pit
-fire_probability(0.10).   % Probability that a non-(1,1) location has fire
-food_probability(0.10).   % Probability that a non-(1,1) location has food
+enemy_probability(0.10).  		% Probability that a non-(1,1) location has an enemy
+wolf_probability(0.10).   		% Probability that a non-(1,1) location has a wolf
+weapon_probability(0.10). 		% Probability that a non-(1,1) location has a weapon
+pit_probability(0.10).    		% Probability that a non-(1,1) location has a pit
+fire_probability(0.10).   		% Probability that a non-(1,1) location has fire
+food_probability(0.10).   		% Probability that a non-(1,1) location has food
 
 
 % initialize(Percept,Size): initializes the Antecessor Primordial World
