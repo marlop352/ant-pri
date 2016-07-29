@@ -156,23 +156,25 @@ initialize_world_generic(Size) :-
   random_member(Type,[tribe,individual]).
 
 
-% initialize_agent: agent is initially alive, destitute (except for one
-%   arrow), in grid 1,1 and facing to the right (0 degrees).
+% initialize_agent: agent is initially alive, of type Type, destitute,
+%	in grid 1,1 and facing to the right (0 degrees).
 
 initialize_agent :-
   retractall(agent_location(_,_)),
   retractall(agent_orientation(_)),
-  retractall(agent_in_cave(_)),
   retractall(agent_health(_)),
-  retractall(agent_gold(_)),
-  retractall(agent_arrows(_)),
+  retractall(agent_weapon(_)),
+  retractall(agent_type(_)),
+  retractall(agent_time_to_starve(_)),
+  retractall(agent_time_to_freeze(_)),
   retractall(agent_score(_)),
   assert(agent_location(1,1)),
   assert(agent_orientation(0)),
-  assert(agent_in_cave(yes)),
   assert(agent_health(alive)),
-  assert(agent_gold(0)),
-  assert(agent_arrows(1)),
+  assert(agent_weapon(0)),
+  assert(agent_type(Type)),
+  assert(agent_time_to_starve(6)),
+  assert(agent_time_to_freeze(4)),
   assert(agent_score(0)).
 
 
