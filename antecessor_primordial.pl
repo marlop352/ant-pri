@@ -32,8 +32,8 @@
   
 
 default_world_extent(10). 		% Default size of the world is 10x10
-default_time_to_starve(6)),		% Default number of rounds until the agent starves(if no food is found)
-default_time_to_freeze(4)),		% Default number of rounds until the agent freezes(if no fire is found)
+default_time_to_starve(6).		% Default number of rounds until the agent starves(if no food is found)
+default_time_to_freeze(4).		% Default number of rounds until the agent freezes(if no fire is found)
 
 enemy_tribe_probability(0.10).	% Probability that a non-(1,1) location has a enemy_tribe
 enemy_probability(0.10). 	 	% Probability that a non-(1,1) location has an enemy
