@@ -9,7 +9,7 @@
 
 :- dynamic
   world_initial_state/1,
-  world_default_extent/1,
+  default_world_extent/1,
   world_extent/1,
   world_cold/1,
   
@@ -31,9 +31,12 @@
   agent_score/1.
   
 
-world_default_extent(10). 		% Default size of the world is 10x10
-enemy_tribe_probability(0.10).  % Probability that a non-(1,1) location has a enemy_tribe
-enemy_probability(0.10).  		% Probability that a non-(1,1) location has an enemy
+default_world_extent(10). 		% Default size of the world is 10x10
+default_time_to_starve(6)),		% Default number of rounds until the agent starves(if no food is found)
+default_time_to_freeze(4)),		% Default number of rounds until the agent freezes(if no fire is found)
+
+enemy_tribe_probability(0.10).	% Probability that a non-(1,1) location has a enemy_tribe
+enemy_probability(0.10). 	 	% Probability that a non-(1,1) location has an enemy
 wolf_probability(0.10).   		% Probability that a non-(1,1) location has a wolf
 weapon_probability(0.10). 		% Probability that a non-(1,1) location has a weapon
 pit_probability(0.10).    		% Probability that a non-(1,1) location has a pit
@@ -74,7 +77,7 @@ restart([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Si
 %	Generates a random world according to the following guidelines:
 %
 %   Size: The default size of the Antecessor Primordial world is 10x10,
-%		but can be changed by changing the value of world_default_extent(Size).
+%		but can be changed by changing the value of default_world_extent(Size).
 %		If Size is set it will be used, if not the default will be used.
 %			
 %
@@ -87,7 +90,7 @@ restart([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Si
 % object(X,Y): there is object in square X,Y
 
 initialize_world() :-
-  world_default_extent(Size),
+  default_world_extent(Size),
   initialize_world_generic(Size).
 
 initialize_world(Size) :-
@@ -154,8 +157,10 @@ initialize_agent(Type) :-
   assert(agent_health(alive)),
   assert(agent_weapon(0)),
   assert(agent_type(Type)),
-  assert(agent_time_to_starve(6)),
-  assert(agent_time_to_freeze(4)),
+  default_time_to_starve(Starve),
+  assert(agent_time_to_starve(Starve)),
+  default_time_to_freeze(Freeze),
+  assert(agent_time_to_freeze(Freeze)),
   assert(agent_score(0)).
 
 
