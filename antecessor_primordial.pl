@@ -338,30 +338,89 @@ decrement_score :-
   S1 is S - 1,
   assert(agent_score(S1)).
 
+% sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food):
+sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food) :-
+  signal_enemy_tribe(Signal_enemy_tribe),
+  signal_enemy(Signal_enemy),
+  signal_wolf(Signal_wolf),
+  signal_weapon(Signal_weapon),
+  signal_pit(Signal_pit),
+  signal_fire(Signal_fire),
+  signal_food(Signal_food).
 
-% stench(Stench): Stench = yes if wumpus (dead or alive) is in a square
-%   directly up, down, left, or right of the current agent location.
 
-stench(yes) :-
+% signal_enemy_tribe(Signal_enemy_tribe): Signal_enemy_tribe = yes if a enemy_tribe is in a square directly up, down,
+%   left, or right of the current agent location.
+
+signal_enemy_tribe(yes) :-
   agent_location(X,Y),
   X1 is X + 1,
   X0 is X - 1,
   Y1 is Y + 1,
   Y0 is Y - 1,
-  ( wumpus_location(X1,Y) ;
-    wumpus_location(X0,Y) ;
-    wumpus_location(X,Y1) ;
-    wumpus_location(X,Y0) ;
-    wumpus_location(X,Y) ),
+  ( enemy_tribe(X1,Y) ;
+    enemy_tribe(X0,Y) ;
+    enemy_tribe(X,Y1) ;
+    enemy_tribe(X,Y0) ;
+    enemy_tribe(X,Y) ),
   !.
 
-stench(no).
+signal_enemy_tribe(no).
 
 
-% breeze(Breeze): Breeze = yes if a pit is in a square directly up, down,
+% signal_enemy(Signal_enemy): Signal_enemy = yes if a enemy is in a square directly up, down,
 %   left, or right of the current agent location.
 
-breeze(yes) :-
+signal_enemy(yes) :-
+  agent_location(X,Y),
+  X1 is X + 1,
+  X0 is X - 1,
+  Y1 is Y + 1,
+  Y0 is Y - 1,
+  ( enemy(X1,Y) ;
+    enemy(X0,Y) ;
+    enemy(X,Y1) ;
+    enemy(X,Y0) ;
+    enemy(X,Y) ),
+  !.
+
+signal_enemy(no).
+
+
+% signal_wolf(Signal_wolf): Signal_wolf = yes if a wolf is in a square directly up, down,
+%   left, or right of the current agent location.
+
+signal_wolf(yes) :-
+  agent_location(X,Y),
+  X1 is X + 1,
+  X0 is X - 1,
+  Y1 is Y + 1,
+  Y0 is Y - 1,
+  ( wolf(X1,Y) ;
+    wolf(X0,Y) ;
+    wolf(X,Y1) ;
+    wolf(X,Y0) ;
+    wolf(X,Y) ),
+  !.
+
+signal_wolf(no).
+
+
+% signal_weapon(Signal_weapon): Signal_weapon = yes if a weapon is in a square directly up, down,
+%   left, or right of the current agent location.
+
+signal_weapon(yes) :-
+  agent_location(X,Y),
+  weapon(X,Y),
+  !.
+
+signal_weapon(no).
+
+
+% signal_pit(Signal_pit): Signal_pit = yes if a pit is in a square directly up, down,
+%   left, or right of the current agent location.
+
+signal_pit(yes) :-
   agent_location(X,Y),
   X1 is X + 1,
   X0 is X - 1,
@@ -374,18 +433,29 @@ breeze(yes) :-
     pit(X,Y)  ),
   !.
 
-breeze(no).
+signal_pit(no).
 
 
-% glitter(Glitter): Glitter = yes if there is gold in the current agent
-%   location.
+% signal_fire(Signal_fire): Signal_fire = yes if a fire is in a square directly up, down,
+%   left, or right of the current agent location.
 
-glitter(yes) :-
+signal_fire(yes) :-
   agent_location(X,Y),
-  gold(X,Y),
+  fire(X,Y),
   !.
 
-glitter(no).
+signal_fire(no).
+
+
+% signal_food(Signal_food): Signal_food = yes if a food is in a square directly up, down,
+%   left, or right of the current agent location.
+
+signal_food(yes) :-
+  agent_location(X,Y),
+  food(X,Y),
+  !.
+
+signal_food(no).
 
 
 % kill_wumpus: pretty obvious
