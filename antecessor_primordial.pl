@@ -134,15 +134,13 @@ initialize_world_generic(Size) :-
   at_least_one_object(food,FoodSqrs,FoodRestSqrs,_),
   
   world_initial_state(Internal_Map),
-  assert_list(Internal_Map),
-  
-  random_member(Type,[tribe,individual]).
+  assert_list(Internal_Map).
 
 
 % initialize_agent: agent is initially alive, of type Type, destitute,
 %	in grid 1,1 and facing to the right (0 degrees).
 
-initialize_agent :-
+initialize_agent(Type) :-
   retractall(agent_location(_,_)),
   retractall(agent_orientation(_)),
   retractall(agent_health(_)),
@@ -542,16 +540,12 @@ display_world :-
   nl,
   world_extent(E),
   display_rows(E,E),
-  wumpus_health(WH),
   agent_orientation(AA),
   agent_health(AH),
-  agent_arrows(N),
-  agent_gold(G),
-  format('wumpus_health(~w)~n',[WH]),
+  agent_weapon(N),
   format('agent_orientation(~d)~n',[AA]),
   format('agent_health(~w)~n',[AH]),
-  format('agent_arrows(~d)~n',[N]),
-  format('agent_gold(~d)~n',[G]).
+  format('agent_weapon(~d)~n',[N]).
 
 display_rows(0,E) :-
   !,
@@ -581,12 +575,8 @@ display_info(X,Y) :-
   agent_orientation(AO),
   display_agent(AO,AC),
   display_location_fact(agent_location,X,Y,AC),
-  display_location_fact(gold,X,Y,'G'),
   display_location_fact(pit,X,Y,'P'),
-  write(' '),
-  wumpus_health(WH),
-  display_wumpus(WH,WC),
-  display_location_fact(wumpus_location,X,Y,WC).
+  write(' ').
 
 display_location_fact(Functor,X,Y,Atom) :-
   Fact =.. [Functor,X,Y],
@@ -601,10 +591,6 @@ display_dashes(E) :-
   RowLen is (E * 6) + 1,
   name('-',[Dash]),
   format('~*c~n',[RowLen,Dash]).
-
-%display_wumpus(Wumpus_Health,Wumpus_Char)
-display_wumpus(alive,'W').
-display_wumpus(dead, 'd').
 
 %display_agent(Agent_Orientation,Agent_Char)
 display_agent(  0,'>').
