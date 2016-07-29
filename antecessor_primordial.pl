@@ -253,7 +253,7 @@ at_least_one_object(Object,AllSqrs,AllSqrs,ObjectRestSqrs) :-
 %     climb:     if in square 1,1, leaves the cave and adds 1000 points
 %                for each piece of gold
 %
-%   Percept = [Stench,Breeze,Glitter,Bump,Scream]
+%   Percept = [Stench,Signal_pit,Glitter,Bump,Scream]
 %             These variables are either 'yes' or 'no'.  
 
 execute(_,[no,no,no,no,no]) :-
@@ -264,50 +264,41 @@ execute(_,[no,no,no,no,no]) :-
   agent_in_cave(no), !,         % agent must be in the cave
   format("You have left the world.~n",[]).
 
-execute(goforward,[Stench,Breeze,Glitter,Bump,no]) :-
+execute(goforward,[Stench,Signal_pit,Glitter,Bump,no]) :-
   decrement_score,
   goforward(Bump),        % update location and check for bump
   update_agent_health,    % check for wumpus or pit
-  stench(Stench),         % update rest of percept
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),         % update rest of percept
   display_action(goforward).
 
-execute(turnleft,[Stench,Breeze,Glitter,no,no]) :-
+execute(turnleft,[Stench,Signal_pit,Glitter,no,no]) :-
   decrement_score,
   agent_orientation(Angle),
   NewAngle is (Angle + 90) mod 360,
   retract(agent_orientation(Angle)),
   assert(agent_orientation(NewAngle)),
-  stench(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   display_action(turnleft).
 
-execute(turnright,[Stench,Breeze,Glitter,no,no]) :-
+execute(turnright,[Stench,Signal_pit,Glitter,no,no]) :-
   decrement_score,
   agent_orientation(Angle),
   NewAngle is (Angle + 270) mod 360,
   retract(agent_orientation(Angle)),
   assert(agent_orientation(NewAngle)),
-  stench(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   display_action(turnright).
 
-execute(grab,[Stench,Breeze,no,no,no]) :-
+execute(grab,[Stench,Signal_pit,no,no,no]) :-
   decrement_score,
   get_the_gold,
-  stench(Stench),
-  breeze(Breeze),
+  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   display_action(grab).
 
-execute(shoot,[Stench,Breeze,Glitter,no,Scream]) :-
+execute(shoot,[Stench,Signal_pit,Glitter,no,Scream]) :-
   decrement_score,
   shoot_arrow(Scream),
-  stench(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   display_action(shoot).
 
 execute(climb,[no,no,no,no,no]) :-  % climb works
@@ -322,11 +313,9 @@ execute(climb,[no,no,no,no,no]) :-  % climb works
   display_action(climb),
   format("I am outta here.~n",[]).
 
-execute(climb,[Stench,Breeze,Glitter,no,no]) :-
+execute(climb,[Stench,Signal_pit,Glitter,no,no]) :-
   decrement_score,
-  stench(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   display_action(climb),
   format("You cannot leave the world from here.~n",[]).
 
@@ -338,6 +327,7 @@ decrement_score :-
   S1 is S - 1,
   assert(agent_score(S1)).
 
+  
 % sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food):
 sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food) :-
   signal_enemy_tribe(Signal_enemy_tribe),
