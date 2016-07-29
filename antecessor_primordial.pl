@@ -70,7 +70,7 @@ initialize([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit
 %   the initial Percept.
 
 restart([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
-  world_retractall,
+  retractall_world,
   world_initial_state(Internal_Map),
   assert_list(Internal_Map),
   agent_type(Type),
@@ -105,7 +105,7 @@ initialize_world(Size) :-
   initialize_world_generic(Size).
 
 initialize_world_generic(Size) :-
-  world_retractall,
+  retractall_world,
   retractall(world_initial_state(_)),
   assert(world_initial_state([])),
   addto_world_init_state(world_extent(Size)),
@@ -172,10 +172,10 @@ initialize_agent(Type) :-
   assert(agent_score(0)).
 
 
-% world_retractall: Retract all Antecessor Primordial world information, except 
+% retractall_world: Retract all Antecessor Primordial world information, except 
 %	about the agent.
 
-world_retractall :-
+retractall_world :-
   retractall(world_extent(_)),
   retractall(world_cold(_)),
   retractall(enemy_tribe(_,_)),
@@ -207,7 +207,7 @@ addto_world_init_state(Fact) :-
   assert(world_initial_state([Fact|Internal_Map])).
 
 
-% assert_list(Internal_Map): Assert all facts on list Internal_Map.
+% assert_list(List): Assert all facts on the list List.
 
 assert_list([]).
 
