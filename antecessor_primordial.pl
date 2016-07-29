@@ -178,15 +178,19 @@ initialize_agent :-
   assert(agent_score(0)).
 
 
-% world_retractall: Retract all wumpus world information, except about the
-%   agent.
+% world_retractall: Retract all Antecessor Primordial world information, except 
+%	about the agent.
 
 world_retractall :-
   retractall(world_extent(_)),
-  retractall(wumpus_location(_,_)),
-  retractall(wumpus_health(_)),
-  retractall(gold(_,_)),
-  retractall(pit(_,_)).
+  retractall(world_cold(_)),
+  retractall(enemy_tribe(_,_)),
+  retractall(enemy(_,_)),
+  retractall(wolf(_,_)),
+  retractall(weapon(_,_)),
+  retractall(pit(_,_)),
+  retractall(fire(_,_)),
+  retractall(food(_,_)).
 
 
 % addto_world_init_state(Fact): Adds Fact to the list Internal_Map stored in
