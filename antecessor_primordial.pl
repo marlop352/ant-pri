@@ -58,17 +58,14 @@ initialize([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit
 % restart(Percept): Restarts the current world from scratch and returns
 %   the initial Percept.
 
-restart([Bark,Scream_enemy,Scream_enemy_tribe,Breeze,Freezing]) :-
+restart([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
   world_retractall,
   world_initial_state(Internal_Map),
   assert_list(Internal_Map),
-  initialize_agent,
+  agent_type(Type),
+  initialize_agent(Type),
   
-  bark(Bark),
-  scream_enemy(Scream_enemy),
-  scream_enemy_tribe(Scream_enemy_tribe),
-  breeze(Breeze),
-  freezing(Freezing),
+  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   
   display_action(restart).
 
