@@ -640,7 +640,13 @@ display_info(X,Y) :-
   agent_orientation(AO),
   display_agent(AO,AC),
   display_location_fact(agent_location,X,Y,AC),
+  display_location_fact(enemy_tribe,X,Y,'T'),
+  display_location_fact(enemy,X,Y,'E'),
+  display_location_fact(wolf,X,Y,'W'),
+  display_location_fact(weapon,X,Y,'X'),
   display_location_fact(pit,X,Y,'P'),
+  display_location_fact(fire,X,Y,'F'),
+  display_location_fact(food,X,Y,'Q'),
   write(' ').
 
 display_location_fact(Functor,X,Y,Atom) :-
@@ -653,7 +659,7 @@ display_location_fact(_,_,_,_) :-
   format(' ',[]).
 
 display_dashes(E) :-
-  RowLen is (E * 6) + 1,
+  RowLen is (E * 10) + 1,
   name('-',[Dash]),
   format('~*c~n',[RowLen,Dash]).
 
