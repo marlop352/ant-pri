@@ -41,30 +41,16 @@ fire_probability(0.10).   % Probability that a non-(1,1) location has fire
 food_probability(0.10).   % Probability that a non-(1,1) location has food
 
 
-% initialize(Percept[,Size]): initializes the Antecessor Primordial World
+% initialize(Percept,Size): initializes the Antecessor Primordial World
 % and our fearless agent and returns the Percept from square 1,1.
 
-initialize([Bark,Scream_enemy,Scream_enemy_tribe,Breeze,Freezing]) :-
-  initialize_world(),
-  initialize_agent,
-  
-  bark(Bark),
-  scream_enemy(Scream_enemy),
-  scream_enemy_tribe(Scream_enemy_tribe),
-  breeze(Breeze),
-  freezing(Freezing),
-  
-  display_action(initialize).
-
-initialize([Bark,Scream_enemy,Scream_enemy_tribe,Breeze,Freezing],Size) :-
+initialize([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food],Size) :-
   initialize_world(Size),
-  initialize_agent,
   
-  bark(Bark),
-  scream_enemy(Scream_enemy),
-  scream_enemy_tribe(Scream_enemy_tribe),
-  breeze(Breeze),
-  freezing(Freezing),
+  random_member(Type,[tribe,individual]),
+  initialize_agent(Type),
+  
+  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   
   display_action(initialize).
 
