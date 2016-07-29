@@ -115,24 +115,45 @@ initialize_world_generic(Size) :-
   retractall(world_initial_state(_)),
   assert(world_initial_state([])),
   addto_world_init_state(world_extent(Size)),
+  
+  random_member(Cold,[yes,no]),
+  addto_world_init_state(world_cold(Cold)),
+  
   all_squares(Size,AllSqrs),
   delete(AllSqrs,[1,1],AllSqrs1),	% remove agent position from valid position list
+
+  enemy_tribe_probability(PEnemyTribe),             % place enemy_tribe(s)
+  place_objects(enemy_tribe,PEnemyTribe,AllSqrs1,EnemyTribeRestSqrs),
+  at_least_one_object(enemy_tribe,AllSqrs1,EnemyTribeRestSqrs,EnemySqrs),
+
+  enemy_probability(PEnemy),             % place enemy(s)
+  place_objects(enemy,PEnemy,EnemySqrs,EnemyRestSqrs),
+  at_least_one_object(enemy,EnemySqrs,EnemyRestSqrs,WolfSqrs),
+
+  wolf_probability(PWolf),             % place wolf(s)
+  place_objects(wolf,PWolf,WolfSqrs,WolfRestSqrs),
+  at_least_one_object(wolf,WolfSqrs,WolfRestSqrs,WeaponSqrs),
   
-  random_member([WX,WY],AllSqrs1),  % initialize wumpus
-  addto_world_init_state(wumpus_location(WX,WY)),
-  addto_world_init_state(wumpus_health(alive)),
-  delete(AllSqrs1,[WX,WY],AllSqrs2),	% remove wumpus position from valid position list
+  weapon_probability(PWeapon),             % place weapon(s)
+  place_objects(weapon,PWeapon,WeaponSqrs,WeaponRestSqrs),
+  at_least_one_object(weapon,WeaponSqrs,WeaponRestSqrs,PitSqrs),
   
-  gold_probability(PG),             % place gold
-  place_objects(gold,PG,AllSqrs2,GRestSqrs),
-  at_least_one_object(gold,AllSqrs2,GRestSqrs,PSqrs),
+  pit_probability(PPit),              % place pit(s)
+  place_objects(pit,PPit,PitSqrs,PitRestSqrs),
+  at_least_one_object(pit,PitSqrs,PitRestSqrs,FireSqrs),
   
-  pit_probability(PP),              % place pits
-  place_objects(pit,PP,PSqrs,PRestSqrs),
-  at_least_one_object(pit,PSqrs,PRestSqrs,_),
+  fire_probability(PFire),             % place fire(s)
+  place_objects(fire,PFire,FireSqrs,FireRestSqrs),
+  at_least_one_object(fire,FireSqrs,FireRestSqrs,FoodSqrs),
+
+  food_probability(PFood),             % place food(s)
+  place_objects(food,PFood,FoodSqrs,FoodRestSqrs),
+  at_least_one_object(food,FoodSqrs,FoodRestSqrs,_),
   
-  world_initial_state(L),
-  assert_list(L).
+  world_initial_state(Internal_Map),
+  assert_list(Internal_Map),
+  
+  random_member(Type,[tribe,individual]).
 
 
 % initialize_agent: agent is initially alive, destitute (except for one
