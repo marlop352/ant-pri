@@ -285,18 +285,14 @@ execute(_,[no,no,no,no,no]) :-
   agent_health(dead), !,         % agent must be alive to execute actions
   format("You are dead!~n",[]).
 
-execute(_,[no,no,no,no,no]) :-
-  agent_in_cave(no), !,         % agent must be in the cave
-  format("You have left the world.~n",[]).
-
-execute(goforward,[Stench,Signal_pit,Glitter,Bump,no]) :-
+execute(goforward,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
   decrement_score,
   goforward(Bump),        % update location and check for bump
   update_agent_health,    % check for wumpus or pit
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),         % update rest of percept
   display_action(goforward).
 
-execute(turnleft,[Stench,Signal_pit,Glitter,no,no]) :-
+execute(turnleft,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
   decrement_score,
   agent_orientation(Angle),
   NewAngle is (Angle + 90) mod 360,
@@ -305,7 +301,7 @@ execute(turnleft,[Stench,Signal_pit,Glitter,no,no]) :-
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   display_action(turnleft).
 
-execute(turnright,[Stench,Signal_pit,Glitter,no,no]) :-
+execute(turnright,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
   decrement_score,
   agent_orientation(Angle),
   NewAngle is (Angle + 270) mod 360,
