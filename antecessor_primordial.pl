@@ -7,28 +7,31 @@
 % A Prolog implementation of the Antecessor Primordial World
 
 
-:- dynamic
+:- dynamic([				% world stuff
   world_initial_state/1,
   default_world_extent/1,
   world_extent/1,
-  world_cold/1,
-  
+  world_cold/1]).
+
+:- dynamic([				% objects stuff
   enemy_tribe/2,
   enemy/2,
   wolf/2,
   weapon/2,
   pit/2,
   fire/2,
-  food/2,
-  
+  food/2]).
+
+:- dynamic([				% known signals stuff
   signal_enemy_tribe_position/2,
   signal_enemy_position/2,
   signal_wolf_position/2,
   signal_weapon_position/2,
   signal_pit_position/2,
   signal_fire_position/2,
-  signal_food_position/2,
-  
+  signal_food_position/2]).
+
+:- dynamic([				% agent stuff
   agent_location/2,
   agent_orientation/1,
   agent_health/1,
@@ -36,7 +39,7 @@
   agent_type/1,
   agent_time_to_starve/1,
   agent_time_to_freeze/1,
-  agent_score/1.
+  agent_score/1]).
   
 
 default_world_extent(10). 		% Default size of the world is 10x10
@@ -329,8 +332,6 @@ execute(climb,[no,no,no,no,no]) :-  % climb works
   retract(agent_score(S)),
   S1 is (S + (1000 * G)),
   assert(agent_score(S1)),
-  retract(agent_in_cave(yes)),
-  assert(agent_in_cave(no)),
   display_action(climb),
   format("I am outta here.~n",[]).
 
