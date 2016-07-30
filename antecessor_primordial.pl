@@ -520,7 +520,9 @@ update_agent_health :-
 	(enemy_tribe(X,Y),(agent_type(individual);agent_weapon(0)));
 	(enemy(X,Y),agent_type(individual),agent_weapon(0));
 	(wolf(X,Y),agent_type(individual),agent_weapon(0));
-	pit(X,Y)
+	pit(X,Y);
+	agent_time_to_starve(0);
+	agent_time_to_freeze(0)
   ),
   !,
   retract(agent_health(alive)),
