@@ -288,7 +288,7 @@ execute(_,[no,no,no,no,no]) :-
 execute(goforward,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
   decrement_score,
   goforward(Bump),        % update location and check for bump
-  update_agent_health,    % check for wumpus or pit
+  update_agent_health,    % check if agent survives movement
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),         % update rest of percept
   display_action(goforward).
 
@@ -511,33 +511,24 @@ new_location(X,Y,270,X,Y1) :-
   Y1 is Y - 1.
 
 
-% update_agent_health: kills agent if in a room with a live wumpus or a
-%   pit.
+% update_agent_health: kills agent acording to the rules of the game
 
 update_agent_health :-
   agent_health(alive),
   agent_location(X,Y),
-  wumpus_health(alive),
-  wumpus_location(X,Y),
+  (
+	(enemy_tribe(X,Y),(agent_type(individual);agent_weapon(0)));
+	(enemy(X,Y),agent_type(individual),agent_weapon(0));
+	(wolf(X,Y),agent_type(individual),agent_weapon(0));
+	pit(X,Y)
+  ),
   !,
   retract(agent_health(alive)),
   assert(agent_health(dead)),
   retract(agent_score(S)),
   S1 is S - 10000,
   assert(agent_score(S1)),
-  format("You are Wumpus food!~n",[]).
-
-update_agent_health :-
-  agent_health(alive),
-  agent_location(X,Y),
-  pit(X,Y),
-  !,
-  retract(agent_health(alive)),
-  assert(agent_health(dead)),
-  retract(agent_score(S)),
-  S1 is S - 10000,
-  assert(agent_score(S1)),
-  format("Aaaaaaaaaaaaaaaaaaa!~n",[]).
+  format("You just died!~n",[]).
 
 update_agent_health.
 
