@@ -46,6 +46,7 @@ pit_probability(0.20).   % Probability that a non-(1,1) location has a pit
 %   1,1.  World can be either 'fig62' for Figure 6.2 of Russell and Norvig,
 %   or 'random' to generate a random world.
 
+
 % print_list(List): print the list List
 print_list(List) :-
   format('~n~nLista = [',[]),
@@ -65,7 +66,7 @@ print_list_item([Fact|List]) :-
 initialize(World,[Stench,Breeze,Glitter,no,no]) :-
   initialize_world(World),
   initialize_agent,
-  stench(Stench),
+  smell(Stench),
   breeze(Breeze),
   glitter(Glitter),
   display_action(initialize).
@@ -73,7 +74,7 @@ initialize(World,[Stench,Breeze,Glitter,no,no]) :-
 initialize(World,[Stench,Breeze,Glitter,no,no],Size) :-
   initialize_world(World,Size),
   initialize_agent,
-  stench(Stench),
+  smell(Stench),
   breeze(Breeze),
   glitter(Glitter),
   display_action(initialize).
@@ -87,7 +88,7 @@ restart([Stench,Breeze,Glitter,no,no]) :-
   ww_initial_state(L),
   assert_list(L),
   initialize_agent,
-  stench(Stench),
+  smell(Stench),
   breeze(Breeze),
   glitter(Glitter),
   display_action(restart).
@@ -294,7 +295,7 @@ execute(goforward,[Stench,Breeze,Glitter,Bump,no]) :-
   decrement_score,
   goforward(Bump),        % update location and check for bump
   update_agent_health,    % check for wumpus or pit
-  stench(Stench),         % update rest of percept
+  smell(Stench),         % update rest of percept
   breeze(Breeze),
   glitter(Glitter),
   display_action(goforward).
@@ -305,7 +306,7 @@ execute(turnleft,[Stench,Breeze,Glitter,no,no]) :-
   NewAngle is (Angle + 90) mod 360,
   retract(agent_orientation(Angle)),
   assert(agent_orientation(NewAngle)),
-  stench(Stench),
+  smell(Stench),
   breeze(Breeze),
   glitter(Glitter),
   display_action(turnleft).
@@ -316,7 +317,7 @@ execute(turnright,[Stench,Breeze,Glitter,no,no]) :-
   NewAngle is (Angle + 270) mod 360,
   retract(agent_orientation(Angle)),
   assert(agent_orientation(NewAngle)),
-  stench(Stench),
+  smell(Stench),
   breeze(Breeze),
   glitter(Glitter),
   display_action(turnright).
@@ -324,14 +325,14 @@ execute(turnright,[Stench,Breeze,Glitter,no,no]) :-
 execute(grab,[Stench,Breeze,no,no,no]) :-
   decrement_score,
   get_the_gold,
-  stench(Stench),
+  smell(Stench),
   breeze(Breeze),
   display_action(grab).
 
 execute(shoot,[Stench,Breeze,Glitter,no,Scream]) :-
   decrement_score,
   shoot_arrow(Scream),
-  stench(Stench),
+  smell(Stench),
   breeze(Breeze),
   glitter(Glitter),
   display_action(shoot).
@@ -350,7 +351,7 @@ execute(climb,[no,no,no,no,no]) :-  % climb works
 
 execute(climb,[Stench,Breeze,Glitter,no,no]) :-
   decrement_score,
-  stench(Stench),
+  smell(Stench),
   breeze(Breeze),
   glitter(Glitter),
   display_action(climb),
@@ -365,10 +366,10 @@ decrement_score :-
   assert(agent_score(S1)).
 
 
-% stench(Stench): Stench = yes if wumpus (dead or alive) is in a square
+% smell(Stench): Stench = yes if wumpus (dead or alive) is in a square
 %   directly up, down, left, or right of the current agent location.
 
-stench(yes) :-
+smell(yes) :-
   agent_location(X,Y),
   X1 is X + 1,
   X0 is X - 1,
@@ -381,7 +382,20 @@ stench(yes) :-
     wumpus_location(X,Y) ),
   !.
 
-stench(no).
+smell(no).
+
+
+if_smelly(yes) :- 
+    smell(yes),
+    agent_location(X,Y),
+    X0 is X - 1,
+    X1 is X + 1,
+    Y0 is Y - 1,
+    Y1 is Y + 1,
+    format(' Possible Wumpus Location X: ~w Y1: ~w ~n', [X,Y1]),
+    format(' Possible Wumpus Location X: ~w Y0: ~w ~n', [X,Y0]),
+    format(' Possible Wumpus Location X1: ~w Y: ~w ~n', [X1,Y]),
+    format(' Possible Wumpus Location X0: ~w Y: ~w ~n', [X0,Y]).
 
 
 % breeze(Breeze): Breeze = yes if a pit is in a square directly up, down,
