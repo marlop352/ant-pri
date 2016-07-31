@@ -287,7 +287,9 @@ execute(_,[no,no,no,no,no]) :-
 execute(goforward,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
   decrement_score,
   goforward(Bump),        % update location and check for bump
+  decrement_status,
   update_agent_health,    % check if agent survives movement
+  (agent_health(alive) *-> (agent_location(X,Y),agent_kills(X,Y)) ; true),
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),         % update rest of percept
   display_action(goforward).
 
@@ -322,6 +324,21 @@ decrement_score :-
   retract(agent_score(S)),
   S1 is S - 1,
   assert(agent_score(S1)).
+
+  
+% decrement_status: subtracts one from agent_time_to_starve and agent_time_to_freeze
+
+decrement_status :-
+  retract(agent_time_to_starve(Starve)),
+  Starve1 is Starve - 1,
+  assert(agent_time_to_starve(Starve1)),
+  (
+    (world_cold(Cold),Cold==yes) *-> (
+      retract(agent_time_to_freeze(Freeze)),
+      Freeze1 is Freeze - 1,
+      assert(agent_time_to_freeze(Freeze1))
+	) ; true 
+  ).
 
   
 % sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food):
@@ -485,9 +502,7 @@ update_agent_health :-
   agent_health(alive),
   agent_location(X,Y),
   (
-	(enemy_tribe(X,Y),(agent_type(individual);agent_weapon(0)));
-	(enemy(X,Y),agent_type(individual),agent_weapon(0));
-	(wolf(X,Y),agent_type(individual),agent_weapon(0));
+	agent_dies(X,Y);
 	pit(X,Y);
 	agent_time_to_starve(0);
 	agent_time_to_freeze(0)
@@ -519,15 +534,38 @@ get_the_gold.
 
 
   agent_location(X,Y),
+% agent_dies(X,Y)
+
+agent_dies(X,Y) :-
+  (enemy_tribe(X,Y), \+agent_survive_enemy_tribe);
+  (enemy(X,Y), \+agent_survive_enemy);
+  (wolf(X,Y), \+agent_survive_wolf).
+
+agent_survive_enemy_tribe :-
+  agent_type(tribe),
+  \+agent_weapon(0).
+
+agent_survive_enemy :-
+  agent_type(tribe);
+  \+agent_weapon(0).
+
+agent_survive_wolf :-
+  agent_type(tribe);
+  \+agent_weapon(0).
+
+% agent_kills
+
+agent_kills(X,Y) :-
+  ( (enemy_tribe(X,Y),agent_survive_enemy_tribe) *-> kill(X,Y,enemy_tribe) ; true ),
+  ( (enemy(X,Y),agent_survive_enemy) *-> kill(X,Y,enemy) ; true ),
+  ( (wolf(X,Y),agent_survive_wolf) *-> kill(X,Y,wolf) ; true ).
 
 
+% kill(X,Y,EnemyType)
 
-
-
-
-
-
-
+kill(X,Y,EnemyType) :-
+  Enemy =.. [EnemyType|[X,Y]],
+  retractall(Enemy).
 
 
 % display_world: Displays everything known about the wumpus world,
