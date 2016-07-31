@@ -313,7 +313,11 @@ execute(turnright,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Sig
 
 execute(grab,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,no]) :-
   decrement_score,
-  get_the_gold,
+  get_food,
+  get_weapon,
+  get_fire,
+  decrement_status,
+  update_agent_health,    % check if agent survives movement
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   display_action(grab).
 
@@ -518,22 +522,50 @@ update_agent_health :-
 update_agent_health.
 
 
-% get_the_gold: adds gold to agents loot if any gold in the square
+% get_weapon: adds weapon to agents "inventory" if any weapon in the square
 
-get_the_gold :-
+get_weapon :-
   agent_location(X,Y),
-  gold(X,Y), !,                   % there's gold in this square!
-  agent_gold(NGold),              %   add to agents loot
-  NGold1 is NGold + 1,
-  retract(agent_gold(NGold)),
-  assert(agent_gold(NGold1)),
-  format("You now have ~d piece(s) of gold!~n",NGold1),
-  retract(gold(X,Y)).             %   delete gold from square
+  weapon(X,Y), !,                   % there's a weapon in this square!
+  agent_weapon(NWeapon),              %   add to agents "inventory"
+  NWeapon1 is NWeapon + 1,
+  retract(agent_weapon(NWeapon)),
+  assert(agent_weapon(NWeapon1)),
+  format("You now have ~d weapon(s)!~n",NWeapon1),
+  retract(weapon(X,Y)).             %   delete weapon(X,Y) from square
 
-get_the_gold.
+ get_weapon.
 
+% get_food: adds food to agents inventory if any food in the square
 
+get_food :-
   agent_location(X,Y),
+  food(X,Y), !,                   % there's a food in this square!
+  agent_time_to_starve(Time),              %   add to agents loot
+  default_time_to_starve(ExtraTime),
+  Time1 is Time + ExtraTime,
+  retract(agent_time_to_starve(Time)),
+  assert(agent_time_to_starve(Time1)),
+  format("You now have ~d round(s) until you starve!~n",Time1),
+  retract(food(X,Y)).             %   delete food(X,Y) from square
+
+ get_food.
+
+% get_fire: adds fire to agents inventory if any fire in the square
+
+get_fire :-
+  agent_location(X,Y),
+  fire(X,Y), !,                   % there's a fire in this square!
+  agent_time_to_freeze(Time),              %   add to agents loot
+  default_time_to_freeze(ExtraTime),
+  Time1 is Time + ExtraTime,
+  retract(agent_time_to_freeze(Time)),
+  assert(agent_time_to_freeze(Time1)),
+  format("You now have ~d round(s) until you freeze!~n",Time1),
+  retract(fire(X,Y)).             %   delete fire(X,Y) from square
+
+ get_fire.
+
 % agent_dies(X,Y)
 
 agent_dies(X,Y) :-
