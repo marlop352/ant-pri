@@ -40,7 +40,11 @@
   agent_time_to_starve/1,
   agent_time_to_freeze/1,
   agent_score/1]).
+
+:- dynamic([				% map stuff
+  map_type/1]).
   
+:- retractall(map_type(_)),assert(map_type(info)).
 
 default_world_extent(10). 		% Default size of the world is 10x10
 default_time_to_starve(6).		% Default number of rounds until the agent starves(if no food is found)
@@ -74,6 +78,7 @@ initialize([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit
 
 restart([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,no]) :-
   retractall_world,
+  retractall_signal,
   world_initial_state(Internal_Map),
   assert_list(Internal_Map),
   agent_type(Type),
@@ -650,7 +655,10 @@ display_square(X,_,E) :-
 
 display_square(X,Y,E) :-
   format('|',[]),
-  display_info(X,Y),
+  map_type(Type),
+  atomic_concat(display_, Type, Display),
+  Do =.. [Display|[X,Y]],
+  Do,
   X1 is X + 1,
   display_square(X1,Y,E).
 
@@ -665,6 +673,19 @@ display_info(X,Y) :-
   display_location_fact(pit,X,Y,'P'),
   display_location_fact(fire,X,Y,'F'),
   display_location_fact(food,X,Y,'Q'),
+  write(' ').
+
+display_signals(X,Y) :-
+  agent_orientation(AO),
+  display_agent(AO,AC),
+  display_location_fact(agent_location,X,Y,AC),
+  display_location_fact(signal_enemy_tribe_position,X,Y,'t'),
+  display_location_fact(signal_enemy_position,X,Y,'e'),
+  display_location_fact(signal_wolf_position,X,Y,'w'),
+  display_location_fact(signal_weapon_position,X,Y,'x'),
+  display_location_fact(signal_pit_position,X,Y,'p'),
+  display_location_fact(signal_fire_position,X,Y,'f'),
+  display_location_fact(signal_food_position,X,Y,'q'),
   write(' ').
 
 display_location_fact(Functor,X,Y,Atom) :-
