@@ -67,16 +67,16 @@ initialize(World,[Stench,Breeze,Glitter,no,no]) :-
   initialize_world(World),
   initialize_agent,
   smell(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Breeze),
+  see(Glitter),
   display_action(initialize).
 
 initialize(World,[Stench,Breeze,Glitter,no,no],Size) :-
   initialize_world(World,Size),
   initialize_agent,
   smell(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Breeze),
+  see(Glitter),
   display_action(initialize).
 
 
@@ -89,8 +89,8 @@ restart([Stench,Breeze,Glitter,no,no]) :-
   assert_list(L),
   initialize_agent,
   smell(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Breeze),
+  see(Glitter),
   display_action(restart).
 
 
@@ -296,8 +296,8 @@ execute(goforward,[Stench,Breeze,Glitter,Bump,no]) :-
   goforward(Bump),        % update location and check for bump
   update_agent_health,    % check for wumpus or pit
   smell(Stench),         % update rest of percept
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Breeze),
+  see(Glitter),
   display_action(goforward).
 
 execute(turnleft,[Stench,Breeze,Glitter,no,no]) :-
@@ -307,8 +307,8 @@ execute(turnleft,[Stench,Breeze,Glitter,no,no]) :-
   retract(agent_orientation(Angle)),
   assert(agent_orientation(NewAngle)),
   smell(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Breeze),
+  see(Glitter),
   display_action(turnleft).
 
 execute(turnright,[Stench,Breeze,Glitter,no,no]) :-
@@ -318,23 +318,23 @@ execute(turnright,[Stench,Breeze,Glitter,no,no]) :-
   retract(agent_orientation(Angle)),
   assert(agent_orientation(NewAngle)),
   smell(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Breeze),
+  see(Glitter),
   display_action(turnright).
 
 execute(grab,[Stench,Breeze,no,no,no]) :-
   decrement_score,
   get_the_gold,
   smell(Stench),
-  breeze(Breeze),
+  sense(Breeze),
   display_action(grab).
 
 execute(shoot,[Stench,Breeze,Glitter,no,Scream]) :-
   decrement_score,
   shoot_arrow(Scream),
   smell(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Breeze),
+  see(Glitter),
   display_action(shoot).
 
 execute(climb,[no,no,no,no,no]) :-  % climb works
@@ -352,8 +352,8 @@ execute(climb,[no,no,no,no,no]) :-  % climb works
 execute(climb,[Stench,Breeze,Glitter,no,no]) :-
   decrement_score,
   smell(Stench),
-  breeze(Breeze),
-  glitter(Glitter),
+  sense(Breeze),
+  see(Glitter),
   display_action(climb),
   format("You cannot leave the cave from here.~n",[]).
 
@@ -384,7 +384,6 @@ smell(yes) :-
 
 smell(no).
 
-
 if_smelly(yes) :- 
     smell(yes),
     agent_location(X,Y),
@@ -398,10 +397,10 @@ if_smelly(yes) :-
     format(' Possible Wumpus Location X0: ~w Y: ~w ~n', [X0,Y]).
 
 
-% breeze(Breeze): Breeze = yes if a pit is in a square directly up, down,
+% sense(Breeze): Breeze = yes if a pit is in a square directly up, down,
 %   left, or right of the current agent location.
 
-breeze(yes) :-
+sense(yes) :-
   agent_location(X,Y),
   X1 is X + 1,
   X0 is X - 1,
@@ -414,19 +413,41 @@ breeze(yes) :-
     pit(X,Y)  ),
   !.
 
-breeze(no).
+sense(no).
 
+if_windy(yes) :- 
+    sense(yes),
+    agent_location(X,Y),
+    X0 is X - 1,
+    X1 is X + 1,
+    Y0 is Y - 1,
+    Y1 is Y + 1,
+    format(' Possible Pit Location X: ~w Y1: ~w ~n', [X,Y1]),
+    format(' Possible Pit Location X: ~w Y0: ~w ~n', [X,Y0]),
+    format(' Possible Pit Location X1: ~w Y: ~w ~n', [X1,Y]),
+    format(' Possible Pit Location X0: ~w Y: ~w ~n', [X0,Y]).
 
-% glitter(Glitter): Glitter = yes if there is gold in the current agent
+% see(Glitter): Glitter = yes if there is gold in the current agent
 %   location.
 
-glitter(yes) :-
+see(yes) :-
   agent_location(X,Y),
   gold(X,Y),
   !.
 
-glitter(no).
+see(no).
 
+if_glittery(yes) :- 
+    see(yes),
+    agent_location(X,Y),
+    X0 is X - 1,
+    X1 is X + 1,
+    Y0 is Y - 1,
+    Y1 is Y + 1,
+    format(' Possible Gold Location X: ~w Y1: ~w ~n', [X,Y1]),
+    format(' Possible Gold Location X: ~w Y0: ~w ~n', [X,Y0]),
+    format(' Possible Gold Location X1: ~w Y: ~w ~n', [X1,Y]),
+    format(' Possible Gold Location X0: ~w Y: ~w ~n', [X0,Y]).
 
 % kill_wumpus: pretty obvious
 
