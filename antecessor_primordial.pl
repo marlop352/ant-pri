@@ -392,6 +392,7 @@ signal_enemy_tribe(yes) :-
     enemy_tribe(X,Y1) ;
     enemy_tribe(X,Y0) ;
     enemy_tribe(X,Y) ),
+  assert(signal_enemy_tribe_position(X,Y)),
   !.
 
 signal_enemy_tribe(no).
@@ -411,6 +412,7 @@ signal_enemy(yes) :-
     enemy(X,Y1) ;
     enemy(X,Y0) ;
     enemy(X,Y) ),
+  assert(signal_enemy_position(X,Y)),
   !.
 
 signal_enemy(no).
@@ -430,6 +432,7 @@ signal_wolf(yes) :-
     wolf(X,Y1) ;
     wolf(X,Y0) ;
     wolf(X,Y) ),
+  assert(signal_wolf_position(X,Y)),
   !.
 
 signal_wolf(no).
@@ -441,6 +444,7 @@ signal_wolf(no).
 signal_weapon(yes) :-
   agent_location(X,Y),
   weapon(X,Y),
+  assert(signal_weapon_position(X,Y)),
   !.
 
 signal_weapon(no).
@@ -460,6 +464,7 @@ signal_pit(yes) :-
     pit(X,Y1) ;
     pit(X,Y0) ;
     pit(X,Y)  ),
+  assert(signal_pit_position(X,Y)),
   !.
 
 signal_pit(no).
@@ -471,6 +476,7 @@ signal_pit(no).
 signal_fire(yes) :-
   agent_location(X,Y),
   fire(X,Y),
+  assert(signal_fire_position(X,Y)),
   !.
 
 signal_fire(no).
@@ -482,6 +488,7 @@ signal_fire(no).
 signal_food(yes) :-
   agent_location(X,Y),
   food(X,Y),
+  assert(signal_food_position(X,Y)),
   !.
 
 signal_food(no).
