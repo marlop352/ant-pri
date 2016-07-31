@@ -72,7 +72,7 @@ initialize([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit
 % restart(Percept): Restarts the current world from scratch and returns
 %   the initial Percept.
 
-restart([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
+restart([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,no]) :-
   retractall_world,
   world_initial_state(Internal_Map),
   assert_list(Internal_Map),
@@ -280,11 +280,11 @@ at_least_one_object(Object,AllSqrs,AllSqrs,ObjectRestSqrs) :-
 %   Percept = [Stench,Signal_pit,Glitter,Bump,Scream]
 %             These variables are either 'yes' or 'no'.  
 
-execute(_,[no,no,no,no,no]) :-
+execute(_,[no,no,no,no,no,no,no]) :-
   agent_health(dead), !,         % agent must be alive to execute actions
   format("You are dead!~n",[]).
 
-execute(goforward,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
+execute(goforward,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,Bump]) :-
   decrement_score,
   goforward(Bump),        % update location and check for bump
   decrement_status,
@@ -293,7 +293,7 @@ execute(goforward,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Sig
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),         % update rest of percept
   display_action(goforward).
 
-execute(turnleft,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
+execute(turnleft,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,no]) :-
   decrement_score,
   agent_orientation(Angle),
   NewAngle is (Angle + 90) mod 360,
@@ -302,7 +302,7 @@ execute(turnleft,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Sign
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   display_action(turnleft).
 
-execute(turnright,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
+execute(turnright,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,no]) :-
   decrement_score,
   agent_orientation(Angle),
   NewAngle is (Angle + 270) mod 360,
@@ -311,7 +311,7 @@ execute(turnright,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Sig
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   display_action(turnright).
 
-execute(grab,[Stench,Signal_pit,no,no,no]) :-
+execute(grab,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,no]) :-
   decrement_score,
   get_the_gold,
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
