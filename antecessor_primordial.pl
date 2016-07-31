@@ -276,10 +276,6 @@ at_least_one_object(Object,AllSqrs,AllSqrs,ObjectRestSqrs) :-
 %     turnleft:  turn left 90 degrees
 %     turnright: turn right 90 degrees
 %     grab:      pickup gold if in square
-%     shoot:     shoot an arrow along orientation, killing wumpus if
-%                in that direction
-%     climb:     if in square 1,1, leaves the cave and adds 1000 points
-%                for each piece of gold
 %
 %   Percept = [Stench,Signal_pit,Glitter,Bump,Scream]
 %             These variables are either 'yes' or 'no'.  
@@ -318,28 +314,6 @@ execute(grab,[Stench,Signal_pit,no,no,no]) :-
   get_the_gold,
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   display_action(grab).
-
-execute(shoot,[Stench,Signal_pit,Glitter,no,Scream]) :-
-  decrement_score,
-  shoot_arrow(Scream),
-  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
-  display_action(shoot).
-
-execute(climb,[no,no,no,no,no]) :-  % climb works
-  agent_location(1,1), !,
-  decrement_score,
-  agent_gold(G),
-  retract(agent_score(S)),
-  S1 is (S + (1000 * G)),
-  assert(agent_score(S1)),
-  display_action(climb),
-  format("I am outta here.~n",[]).
-
-execute(climb,[Stench,Signal_pit,Glitter,no,no]) :-
-  decrement_score,
-  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
-  display_action(climb),
-  format("You cannot leave the world from here.~n",[]).
 
 
 % decrement_score: subtracts one from agent_score for each move
@@ -470,13 +444,6 @@ signal_food(yes) :-
 signal_food(no).
 
 
-% kill_wumpus: pretty obvious
-
-kill_wumpus :-
-  retract(wumpus_health(alive)),
-  assert(wumpus_health(dead)).
-
-
 % goforward(Bump): Attempts to move agent forward one unit along
 %   its current orientation.
 
@@ -551,62 +518,16 @@ get_the_gold :-
 get_the_gold.
 
 
-% shoot_arrow(Scream): If agent has an arrow, then shoot it in the
-%   direction the agent is facing and listen for Scream.
-
-shoot_arrow(Scream) :-
-  agent_arrows(Arrows),
-  Arrows > 0, !,                  % agent has an arrow and will use it!
-  Arrows1 is Arrows - 1,          %   update number of arrows
-  retract(agent_arrows(Arrows)),
-  assert(agent_arrows(Arrows1)),
-  format("You now have ~d arrow(s).~n",Arrows1),
   agent_location(X,Y),
-  agent_orientation(Angle),
-  propagate_arrow(X,Y,Angle,Scream).
-
-shoot_arrow(no).
 
 
-% propagate_arrow(X,Y,Angle,Scream): If wumpus is at X,Y then hear its
-%   woeful scream as you vanquish the creature.  If not, then move arrow
-%   one square along Angle and try again.  If arrow hits a wall, then
-%   you missed.
 
-propagate_arrow(X,Y,_,yes) :-
-  wumpus_location(X,Y), !,
-  kill_wumpus,
-  retract(agent_score(S)),
-  S1 is (S + 500),
-  assert(agent_score(S1)).
 
-propagate_arrow(X,Y,0,Scream) :-
-  X1 is X + 1,
-  world_extent(E),
-  X1 =< E,
-  !,
-  propagate_arrow(X1,Y,0,Scream).
 
-propagate_arrow(X,Y,90,Scream) :-
-  Y1 is Y + 1,
-  world_extent(E),
-  Y1 =< E,
-  !,
-  propagate_arrow(X,Y1,90,Scream).
 
-propagate_arrow(X,Y,180,Scream) :-
-  X1 is X - 1,
-  X1 > 0,
-  !,
-  propagate_arrow(X1,Y,180,Scream).
 
-propagate_arrow(X,Y,270,Scream) :-
-  Y1 is Y - 1,
-  Y1 > 0,
-  !,
-  propagate_arrow(X,Y1,270,Scream).
 
-propagate_arrow(_,_,_,no).
+
 
 
 % display_world: Displays everything known about the wumpus world,
