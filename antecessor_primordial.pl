@@ -84,6 +84,23 @@ restart([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Si
   display_action(restart).
 
 
+% resurrect_agent(Percept): Resurrect the agent returns the Percept.
+
+resurrect_agent([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,no]) :-
+  retractall(agent_health(_)),
+  retractall(agent_time_to_starve(_)),
+  retractall(agent_time_to_freeze(_)),
+  default_time_to_starve(Starve),
+  assert(agent_time_to_starve(Starve)),
+  default_time_to_freeze(Freeze),
+  assert(agent_time_to_freeze(Freeze)),
+  assert(agent_health(alive)),
+  
+  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
+  
+  display_action(resurrect).
+
+
 % initialize_world(Size): Initializes the Antecessor Primordial world.
 %	Generates a random world according to the following guidelines:
 %
