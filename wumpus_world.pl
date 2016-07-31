@@ -46,6 +46,22 @@ pit_probability(0.20).   % Probability that a non-(1,1) location has a pit
 %   1,1.  World can be either 'fig62' for Figure 6.2 of Russell and Norvig,
 %   or 'random' to generate a random world.
 
+% print_list(List): print the list List
+print_list(List) :-
+  format('~n~nLista = [',[]),
+  print_list_itens(List),
+  format(']~n~n',[]).
+
+print_list_itens([Fact|List]) :-
+  format("~w",[Fact]),
+  print_list_item(List).
+
+print_list_item([]).
+
+print_list_item([Fact|List]) :-
+  format(", ~w",[Fact]),
+  print_list_item(List).
+
 initialize(World,[Stench,Breeze,Glitter,no,no]) :-
   initialize_world(World),
   initialize_agent,
