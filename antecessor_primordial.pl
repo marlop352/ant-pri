@@ -44,7 +44,8 @@
 :- dynamic([				% map stuff
   map_type/1]).
   
-:- retractall(map_type(_)),assert(map_type(info)).
+set_map_type(Type) :- retractall(map_type(_)),assert(map_type(Type)).
+:- set_map_type(info).
 
 default_world_extent(10). 		% Default size of the world is 10x10
 default_time_to_starve(6).		% Default number of rounds until the agent starves(if no food is found)
