@@ -737,6 +737,16 @@ display_world :-
   format('O agente morrerá de frio em: ~d ações(grab, goforward)~n',[ATF]),
   format('O agente morrerá de fome em: ~d ações(grab, goforward)~n',[ATS]),
   format('Número de itens arma que o agente possui: ~d~n',[N]),
+  format("~nLegenda:"),
+  format("
+    T = Tribo de Murlocks Malvados    signal: t
+    E = Murlocks Inimigos Solitarios  signal: e
+    W = Lobo                          signal: w
+    X = Arma                          signal: x
+    P = Buraco                        signal: p
+    F = Fire                          signal: f
+    Q = Comida                        signal: q
+  ").
 
 display_rows(0,E) :-
   !,
