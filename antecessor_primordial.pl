@@ -62,37 +62,93 @@ food_probability(0.10).   		% Probability that a non-(1,1) location has food
 
 io_sig_TS(X,Y):-
     open('dd_map.txt', append,Stream),
-    write(Stream, 'Possible Tribe of Murlocks at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  BEWARE!!!!'), nl(Stream),
+    write(Stream, 'Possible Tribe of Murlocks from X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  BEWARE!!!!'), nl(Stream),
+    X1 is X + 1,
+    X0 is X - 1,
+    Y1 is Y + 1,
+    Y0 is Y - 1,
+    write(Stream, 'Possible Locations are: ['),write(Stream, X1),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X0),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y1),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y0),write(Stream,']'),nl(Stream),
     close(Stream).
 
 io_sig_ES(X,Y):-
     open('dd_map.txt', append,Stream),
-    write(Stream, 'Possible Murlock Fighter at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  BEWARE!!!!'), nl(Stream),
+    write(Stream, 'Possible Murlock Fighter from X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  BEWARE!!!!'), nl(Stream),
+    X1 is X + 1,
+    X0 is X - 1,
+    Y1 is Y + 1,
+    Y0 is Y - 1,
+    write(Stream, 'Possible Locations are: ['),write(Stream, X1),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X0),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y1),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y0),write(Stream,']'),nl(Stream),
     close(Stream).
 
 io_sig_H(X,Y):-
     open('dd_map.txt', append,Stream),
-    write(Stream, 'Possible Wolf at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  BEWARE!!!!'), nl(Stream),
+    write(Stream, 'Possible Wolf from X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  BEWARE!!!!'), nl(Stream),
+    X1 is X + 1,
+    X0 is X - 1,
+    Y1 is Y + 1,
+    Y0 is Y - 1,
+    write(Stream, 'Possible Locations are: ['),write(Stream, X1),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X0),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y1),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y0),write(Stream,']'),nl(Stream),
     close(Stream).
 
 io_sig_B(X,Y):-
     open('dd_map.txt', append,Stream),
-    write(Stream, 'Possible Hole at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  Dont fall in!'), nl(Stream),
+    write(Stream, 'Possible Hole from X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  Dont fall in!'), nl(Stream),
+    X1 is X + 1,
+    X0 is X - 1,
+    Y1 is Y + 1,
+    Y0 is Y - 1,
+    write(Stream, 'Possible Locations are: ['),write(Stream, X1),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X0),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y1),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y0),write(Stream,']'),nl(Stream),
     close(Stream).
 
 io_sig_S(X,Y):-
     open('dd_map.txt', append,Stream),
-    write(Stream, 'There might be food at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  Yummy!'), nl(Stream),
+    write(Stream, 'There might from food at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  Yummy!'), nl(Stream),
+    X1 is X + 1,
+    X0 is X - 1,
+    Y1 is Y + 1,
+    Y0 is Y - 1,
+    write(Stream, 'Possible Locations are: ['),write(Stream, X1),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X0),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y1),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y0),write(Stream,']'),nl(Stream),
     close(Stream).
 
 io_sig_F(X,Y):-
     open('dd_map.txt', append,Stream),
-    write(Stream, 'Possible fire at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, ' . Tosty...'), nl(Stream),
+    write(Stream, 'Possible fire from X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, ' . Tosty...'), nl(Stream),
+    X1 is X + 1,
+    X0 is X - 1,
+    Y1 is Y + 1,
+    Y0 is Y - 1,
+    write(Stream, 'Possible Locations are: ['),write(Stream, X1),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X0),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y1),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y0),write(Stream,']'),nl(Stream),
     close(Stream).
 
 io_sig_X(X,Y):-
     open('dd_map.txt', append,Stream),
-    write(Stream, 'Possible rifle at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, ' . Piu piu!'), nl(Stream),
+    write(Stream, 'Possible rifle from X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, ' . Piu piu!'), nl(Stream),
+    X1 is X + 1,
+    X0 is X - 1,
+    Y1 is Y + 1,
+    Y0 is Y - 1,
+    write(Stream, 'Possible Locations are: ['),write(Stream, X1),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X0),write(Stream, ','), write(Stream, Y),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y1),write(Stream,']'),nl(Stream),
+    write(Stream, 'Possible Locations are: ['),write(Stream, X),write(Stream, ','), write(Stream, Y0),write(Stream,']'),nl(Stream),
     close(Stream).
 %-------------------------------------------
 
@@ -434,7 +490,6 @@ signal_enemy_tribe(yes) :-
 
 signal_enemy_tribe(no).
 
-% if_sigTS
 if_sigT(yes) :- 
     signal_enemy_tribe(yes),
     agent_location(X,Y),
