@@ -1,12 +1,12 @@
 
 * Lobos:
- - Latidos podem ser ouvido até dois espaços de distancia, portanto lobos geram latidos em todas as direçoes até dois espaços de distancia.
+ - Latidos podem ser ouvido há um espaço de distância.
  
 * Inimigos Individuais: 
- - Gritos podem ser ouvidos há um espaço de distancia. 
+ - Gritos podem ser ouvidos há um espaço de distância. 
  
 * Inimigos Tribais:
-  - Gritos altos podem ser ouividos até dois espaço de distancia.
+  - Gritos altos podem ser ouvidos há um espaço de distância.
 
 * Precipício:
  - Rajadas de ventos podem ser sentidas a um espaço de distancia.

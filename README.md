@@ -31,13 +31,13 @@ Todas as tribos ou indivíduos inimigos estão sempre armados.
   
   Frio é universal.
   
-  - Se passar mais de 3 rodadas sem encontrar Fogo, morre de frio.
+  - Se passar mais de 6 rodadas sem encontrar Fogo, morre de frio.
   - Fogo é recurso utilitário, uma vez encontrado é consumido. 
 
 ## Fome:
 
   - Alimentos são itens utilitários, uma vez encontrado é consumido. 
-  - Se passar mais de 4 rodadas sem encontrar comida, morre de fome.
+  - Se passar mais de 8 rodadas sem encontrar comida, morre de fome.
 	
 ## Precipício:
   
