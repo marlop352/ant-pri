@@ -13,23 +13,23 @@
   world_extent/1,
   world_cold/1]).
 
-:- dynamic([				% objects stuff
-  enemy_tribe/2,
-  enemy/2,
-  wolf/2,
-  weapon/2,
-  pit/2,
-  fire/2,
-  food/2]).
+:- dynamic([				% known objects stuff
+  enemy_tribe/3,
+  enemy/3,
+  wolf/3,
+  weapon/3,
+  pit/3,
+  fire/3,
+  food/3]).
 
 :- dynamic([				% known signals stuff
-  signal_enemy_tribe_position/2,
-  signal_enemy_position/2,
-  signal_wolf_position/2,
-  signal_weapon_position/2,
-  signal_pit_position/2,
-  signal_fire_position/2,
-  signal_food_position/2]).
+  signal_enemy/3,
+  signal_enemy/3,
+  signal_wolf/3,
+  signal_weapon/3,
+  signal_pit/3,
+  signal_fire/3,
+  signal_food/3]).
 
 :- dynamic([				% agent stuff
   agent_location/2,
@@ -131,6 +131,7 @@ initialize_world(Size) :-
 
 initialize_world_generic(Size) :-
   retractall_world,
+  retractall_signal,
   retractall(world_initial_state(_)),
   assert(world_initial_state([])),
   addto_world_init_state(world_extent(Size)),
@@ -144,30 +145,37 @@ initialize_world_generic(Size) :-
   enemy_tribe_probability(PEnemyTribe),             % place enemy_tribe(s)
   place_objects(enemy_tribe,PEnemyTribe,AllSqrs1,EnemyTribeRestSqrs),
   at_least_one_object(enemy_tribe,AllSqrs1,EnemyTribeRestSqrs,EnemySqrs),
+  place_signal(signal_enemy_tribe,AllSqrs),
 
   enemy_probability(PEnemy),             % place enemy(s)
   place_objects(enemy,PEnemy,EnemySqrs,EnemyRestSqrs),
   at_least_one_object(enemy,EnemySqrs,EnemyRestSqrs,WolfSqrs),
+  place_signal(signal_enemy,AllSqrs),
 
   wolf_probability(PWolf),             % place wolf(s)
   place_objects(wolf,PWolf,WolfSqrs,WolfRestSqrs),
   at_least_one_object(wolf,WolfSqrs,WolfRestSqrs,WeaponSqrs),
+  place_signal(signal_wolf,AllSqrs),
   
   weapon_probability(PWeapon),             % place weapon(s)
   place_objects(weapon,PWeapon,WeaponSqrs,WeaponRestSqrs),
   at_least_one_object(weapon,WeaponSqrs,WeaponRestSqrs,PitSqrs),
+  place_signal(signal_weapon,AllSqrs),
   
   pit_probability(PPit),              % place pit(s)
   place_objects(pit,PPit,PitSqrs,PitRestSqrs),
   at_least_one_object(pit,PitSqrs,PitRestSqrs,FireSqrs),
+  place_signal(signal_pit,AllSqrs),
   
   fire_probability(PFire),             % place fire(s)
   place_objects(fire,PFire,FireSqrs,FireRestSqrs),
   at_least_one_object(fire,FireSqrs,FireRestSqrs,FoodSqrs),
+  place_signal(signal_fire,AllSqrs),
 
   food_probability(PFood),             % place food(s)
   place_objects(food,PFood,FoodSqrs,FoodRestSqrs),
   at_least_one_object(food,FoodSqrs,FoodRestSqrs,_),
+  place_signal(signal_food,AllSqrs),
   
   world_initial_state(Internal_Map),
   assert_list(Internal_Map).
@@ -215,13 +223,13 @@ retractall_world :-
 % retractall_signal: Retract all Antecessor Primordial signal information.
 
 retractall_signal :-
-  retractall(signal_enemy_tribe_position(_,_)),
-  retractall(signal_enemy_position(_,_)),
-  retractall(signal_wolf_position(_,_)),
-  retractall(signal_weapon_position(_,_)),
-  retractall(signal_pit_position(_,_)),
-  retractall(signal_fire_position(_,_)),
-  retractall(signal_food_position(_,_)).
+  retractall(signal_enemy_tribe(_,_,_)),
+  retractall(signal_enemy(_,_,_)),
+  retractall(signal_wolf(_,_,_)),
+  retractall(signal_weapon(_,_,_)),
+  retractall(signal_pit(_,_,_)),
+  retractall(signal_fire(_,_,_)),
+  retractall(signal_food(_,_,_)).
   
   
 % addto_world_init_state(Fact): Adds Fact to the list Internal_Map stored in
@@ -268,12 +276,31 @@ place_objects(_,_,[],[]).
 place_objects(Object,P,[Square|Squares],RestSquares) :-
   maybe(P),   % succeeds with probability P
   !,
-  Fact =.. [Object|Square],
+  segment_square(Square,X,Y),
+  Fact =.. [Object,X,Y,yes],
   addto_world_init_state(Fact),
   place_objects(Object,P,Squares,RestSquares).
 
 place_objects(Object,P,[Square|Squares],[Square|RestSquares]) :-
   place_objects(Object,P,Squares, RestSquares).
+
+
+% place_signal(Signal,Squares): For each square in Squares, place
+%   Object at square with probability P.
+
+place_signal(_,[]).
+
+place_signal(Signal,[Square|Squares]) :-
+  segment_square(Square,X,Y),
+  Fact =.. [Signal,X,Y,unknown],
+  addto_world_init_state(Fact),
+  place_signal(Signal,Squares).
+
+segment_square(Square,X,Y) :-
+  Segment =.. [position|Square],
+  assert(Segment),
+  position(X,Y),
+  retractall(position(_,_)).
 
 
 % at_least_one_object(Object,AllSqrs,ObjectRestSqrs,NextObjectTypeSqrs):
@@ -369,129 +396,189 @@ decrement_status :-
   
 % sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food):
 sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food) :-
-  signal_enemy_tribe(Signal_enemy_tribe),
-  signal_enemy(Signal_enemy),
-  signal_wolf(Signal_wolf),
-  signal_weapon(Signal_weapon),
-  signal_pit(Signal_pit),
-  signal_fire(Signal_fire),
-  signal_food(Signal_food).
+  is_signal_enemy_tribe(Signal_enemy_tribe),
+  ( is_enemy_tribe(X,Y) *-> true ; assert(enemy_tribe(X,Y,no)) ),
+  is_signal_enemy(Signal_enemy),
+  ( is_enemy(X,Y) *-> true ; assert(enemy(X,Y,no)) ),
+  is_signal_wolf(Signal_wolf),
+  ( is_wolf(X,Y) *-> true ; assert(wolf(X,Y,no)) ),
+  is_signal_weapon(Signal_weapon),
+  ( is_weapon(X,Y) *-> true ; assert(weapon(X,Y,no)) ),
+  is_signal_pit(Signal_pit),
+  ( is_pit(X,Y) *-> true ; assert(pit(X,Y,no)) ),
+  is_signal_fire(Signal_fire),
+  ( is_fire(X,Y) *-> true ; assert(fire(X,Y,no)) ),
+  is_signal_food(Signal_food),
+  ( is_food(X,Y) *-> true ; assert(food(X,Y,no)) ).
 
 
-% signal_enemy_tribe(Signal_enemy_tribe): Signal_enemy_tribe = yes if a enemy_tribe is in a square directly up, down,
+is_enemy_tribe(X,Y) :-
+  enemy_tribe(X,Y,yes).
+
+is_enemy(X,Y) :-
+  enemy(X,Y,yes).
+
+is_wolf(X,Y) :-
+  wolf(X,Y,yes).
+
+is_weapon(X,Y) :-
+  weapon(X,Y,yes).
+
+is_pit(X,Y) :-
+  pit(X,Y,yes).
+
+is_fire(X,Y) :-
+  fire(X,Y,yes).
+
+is_food(X,Y) :-
+  food(X,Y,yes).
+
+
+% is_signal_enemy_tribe(Signal_enemy_tribe): Signal_enemy_tribe = yes if a enemy_tribe is in a square directly up, down,
 %   left, or right of the current agent location.
 
-signal_enemy_tribe(yes) :-
+is_signal_enemy_tribe(yes) :-
   agent_location(X,Y),
   X1 is X + 1,
   X0 is X - 1,
   Y1 is Y + 1,
   Y0 is Y - 1,
-  ( enemy_tribe(X1,Y) ;
-    enemy_tribe(X0,Y) ;
-    enemy_tribe(X,Y1) ;
-    enemy_tribe(X,Y0) ;
-    enemy_tribe(X,Y) ),
-  assert(signal_enemy_tribe_position(X,Y)),
+  ( is_enemy_tribe(X1,Y) ;
+    is_enemy_tribe(X0,Y) ;
+    is_enemy_tribe(X,Y1) ;
+    is_enemy_tribe(X,Y0) ),
+  retractall(signal_enemy_tribe(X,Y,_)),
+  assert(signal_enemy_tribe(X,Y,yes)),
   !.
 
-signal_enemy_tribe(no).
+is_signal_enemy_tribe(no) :-
+  agent_location(X,Y),
+  retractall(signal_enemy_tribe(X,Y,_)),
+  assert(signal_enemy_tribe(X,Y,no)),
+  !.
 
 
-% signal_enemy(Signal_enemy): Signal_enemy = yes if a enemy is in a square directly up, down,
+% is_signal_enemy(Signal_enemy): Signal_enemy = yes if a enemy is in a square directly up, down,
 %   left, or right of the current agent location.
 
-signal_enemy(yes) :-
+is_signal_enemy(yes) :-
   agent_location(X,Y),
   X1 is X + 1,
   X0 is X - 1,
   Y1 is Y + 1,
   Y0 is Y - 1,
-  ( enemy(X1,Y) ;
-    enemy(X0,Y) ;
-    enemy(X,Y1) ;
-    enemy(X,Y0) ;
-    enemy(X,Y) ),
-  assert(signal_enemy_position(X,Y)),
+  ( is_enemy(X1,Y) ;
+    is_enemy(X0,Y) ;
+    is_enemy(X,Y1) ;
+    is_enemy(X,Y0) ),
+  retractall(signal_enemy(X,Y,_)),
+  assert(signal_enemy(X,Y,yes)),
   !.
 
-signal_enemy(no).
+is_signal_enemy(no) :-
+  agent_location(X,Y),
+  retractall(signal_enemy(X,Y,_)),
+  assert(signal_enemy(X,Y,no)),
+  !.
 
 
-% signal_wolf(Signal_wolf): Signal_wolf = yes if a wolf is in a square directly up, down,
+% is_signal_wolf(Signal_wolf): Signal_wolf = yes if a wolf is in a square directly up, down,
 %   left, or right of the current agent location.
 
-signal_wolf(yes) :-
+is_signal_wolf(yes) :-
   agent_location(X,Y),
   X1 is X + 1,
   X0 is X - 1,
   Y1 is Y + 1,
   Y0 is Y - 1,
-  ( wolf(X1,Y) ;
-    wolf(X0,Y) ;
-    wolf(X,Y1) ;
-    wolf(X,Y0) ;
-    wolf(X,Y) ),
-  assert(signal_wolf_position(X,Y)),
+  ( is_wolf(X1,Y) ;
+    is_wolf(X0,Y) ;
+    is_wolf(X,Y1) ;
+    is_wolf(X,Y0) ),
+  retractall(signal_wolf(X,Y,_)),
+  assert(signal_wolf(X,Y,yes)),
   !.
 
-signal_wolf(no).
-
-
-% signal_weapon(Signal_weapon): Signal_weapon = yes if a weapon is in a square directly up, down,
-%   left, or right of the current agent location.
-
-signal_weapon(yes) :-
+is_signal_wolf(no) :-
   agent_location(X,Y),
-  weapon(X,Y),
-  assert(signal_weapon_position(X,Y)),
+  retractall(signal_wolf(X,Y,_)),
+  assert(signal_wolf(X,Y,no)),
   !.
 
-signal_weapon(no).
 
-
-% signal_pit(Signal_pit): Signal_pit = yes if a pit is in a square directly up, down,
+% is_signal_weapon(Signal_weapon): Signal_weapon = yes if a weapon is in a square directly up, down,
 %   left, or right of the current agent location.
 
-signal_pit(yes) :-
+is_signal_weapon(yes) :-
+  agent_location(X,Y),
+  is_weapon(X,Y),
+  retractall(signal_weapon(X,Y,_)),
+  assert(signal_weapon(X,Y,yes)),
+  !.
+
+is_signal_weapon(no) :-
+  agent_location(X,Y),
+  retractall(signal_weapon(X,Y,_)),
+  assert(signal_weapon(X,Y,no)),
+  !.
+
+
+% is_signal_pit(Signal_pit): Signal_pit = yes if a pit is in a square directly up, down,
+%   left, or right of the current agent location.
+
+is_signal_pit(yes) :-
   agent_location(X,Y),
   X1 is X + 1,
   X0 is X - 1,
   Y1 is Y + 1,
   Y0 is Y - 1,
-  ( pit(X1,Y) ;
-    pit(X0,Y) ;
-    pit(X,Y1) ;
-    pit(X,Y0) ;
-    pit(X,Y)  ),
-  assert(signal_pit_position(X,Y)),
+  ( is_pit(X1,Y) ;
+    is_pit(X0,Y) ;
+    is_pit(X,Y1) ;
+    is_pit(X,Y0) ),
+  retractall(signal_pit(X,Y,_)),
+  assert(signal_pit(X,Y,yes)),
   !.
 
-signal_pit(no).
+is_signal_pit(no) :-
+  agent_location(X,Y),
+  retractall(signal_pit(X,Y,_)),
+  assert(signal_pit(X,Y,no)),
+  !.
 
 
-% signal_fire(Signal_fire): Signal_fire = yes if a fire is in a square directly up, down,
+% is_signal_fire(Signal_fire): Signal_fire = yes if a fire is in a square directly up, down,
 %   left, or right of the current agent location.
 
-signal_fire(yes) :-
+is_signal_fire(yes) :-
   agent_location(X,Y),
-  fire(X,Y),
-  assert(signal_fire_position(X,Y)),
+  is_fire(X,Y),
+  retractall(signal_fire(X,Y,_)),
+  assert(signal_fire(X,Y,yes)),
   !.
 
-signal_fire(no).
+is_signal_fire(no) :-
+  agent_location(X,Y),
+  retractall(signal_fire(X,Y,_)),
+  assert(signal_fire(X,Y,no)),
+  !.
 
 
-% signal_food(Signal_food): Signal_food = yes if a food is in a square directly up, down,
+% is_signal_food(Signal_food): Signal_food = yes if a food is in a square directly up, down,
 %   left, or right of the current agent location.
 
-signal_food(yes) :-
+is_signal_food(yes) :-
   agent_location(X,Y),
-  food(X,Y),
-  assert(signal_food_position(X,Y)),
+  is_food(X,Y),
+  retractall(signal_food(X,Y,_)),
+  assert(signal_food(X,Y,yes)),
   !.
 
-signal_food(no).
+is_signal_food(no) :-
+  agent_location(X,Y),
+  retractall(signal_food(X,Y,_)),
+  assert(signal_food(X,Y,no)),
+  !.
 
 
 % goforward(Bump): Attempts to move agent forward one unit along
@@ -536,7 +623,7 @@ update_agent_health :-
   agent_location(X,Y),
   (
 	agent_dies(X,Y);
-	pit(X,Y);
+	is_pit(X,Y);
 	agent_time_to_starve(0);
 	agent_time_to_freeze(0)
   ),
@@ -555,13 +642,13 @@ update_agent_health.
 
 get_weapon :-
   agent_location(X,Y),
-  weapon(X,Y), !,                   % there's a weapon in this square!
+  is_weapon(X,Y), !,                   % there's a weapon in this square!
   agent_weapon(NWeapon),              %   add to agents "inventory"
   NWeapon1 is NWeapon + 1,
   retract(agent_weapon(NWeapon)),
   assert(agent_weapon(NWeapon1)),
   format("You now have ~d weapon(s)!~n",NWeapon1),
-  retract(weapon(X,Y)).             %   delete weapon(X,Y) from square
+  retract(weapon(X,Y,_)).             %   delete weapon(X,Y) from square
 
  get_weapon.
 
@@ -569,14 +656,14 @@ get_weapon :-
 
 get_food :-
   agent_location(X,Y),
-  food(X,Y), !,                   % there's a food in this square!
+  is_food(X,Y), !,                   % there's a food in this square!
   agent_time_to_starve(Time),              %   add to agents loot
   default_time_to_starve(ExtraTime),
   Time1 is Time + ExtraTime,
   retract(agent_time_to_starve(Time)),
   assert(agent_time_to_starve(Time1)),
   format("You now have ~d round(s) until you starve!~n",Time1),
-  retract(food(X,Y)).             %   delete food(X,Y) from square
+  retract(food(X,Y,_)).             %   delete food(X,Y) from square
 
  get_food.
 
@@ -584,23 +671,23 @@ get_food :-
 
 get_fire :-
   agent_location(X,Y),
-  fire(X,Y), !,                   % there's a fire in this square!
+  is_fire(X,Y), !,                   % there's a fire in this square!
   agent_time_to_freeze(Time),              %   add to agents loot
   default_time_to_freeze(ExtraTime),
   Time1 is Time + ExtraTime,
   retract(agent_time_to_freeze(Time)),
   assert(agent_time_to_freeze(Time1)),
   format("You now have ~d round(s) until you freeze!~n",Time1),
-  retract(fire(X,Y)).             %   delete fire(X,Y) from square
+  retractall(fire(X,Y,_)).             %   delete fire(X,Y) from square
 
  get_fire.
 
 % agent_dies(X,Y)
 
 agent_dies(X,Y) :-
-  (enemy_tribe(X,Y), \+agent_survive_enemy_tribe);
-  (enemy(X,Y), \+agent_survive_enemy);
-  (wolf(X,Y), \+agent_survive_wolf).
+  (is_enemy_tribe(X,Y), \+agent_survive_enemy_tribe);
+  (is_enemy(X,Y), \+agent_survive_enemy);
+  (is_wolf(X,Y), \+agent_survive_wolf).
 
 agent_survive_enemy_tribe :-
   agent_type(tribe),
@@ -617,16 +704,18 @@ agent_survive_wolf :-
 % agent_kills
 
 agent_kills(X,Y) :-
-  ( (enemy_tribe(X,Y),agent_survive_enemy_tribe) *-> kill(X,Y,enemy_tribe) ; true ),
-  ( (enemy(X,Y),agent_survive_enemy) *-> kill(X,Y,enemy) ; true ),
-  ( (wolf(X,Y),agent_survive_wolf) *-> kill(X,Y,wolf) ; true ).
+  ( (is_enemy_tribe(X,Y),agent_survive_enemy_tribe) *-> kill(X,Y,enemy_tribe) ; true ),
+  ( (is_enemy(X,Y),agent_survive_enemy) *-> kill(X,Y,enemy) ; true ),
+  ( (is_wolf(X,Y),agent_survive_wolf) *-> kill(X,Y,wolf) ; true ).
 
 
 % kill(X,Y,EnemyType)
 
 kill(X,Y,EnemyType) :-
-  Enemy =.. [EnemyType|[X,Y]],
-  retractall(Enemy).
+  Enemy =.. [EnemyType,X,Y,yes],
+  retractall(Enemy),
+  NewEnemy =.. [EnemyType,X,Y,no],
+  assert(NewEnemy).
 
 
 % display_world: Displays everything known about the wumpus world,
@@ -673,26 +762,13 @@ display_info(X,Y) :-
   agent_orientation(AO),
   display_agent(AO,AC),
   display_location_fact(agent_location,X,Y,AC),
-  display_location_fact(enemy_tribe,X,Y,'T'),
-  display_location_fact(enemy,X,Y,'E'),
-  display_location_fact(wolf,X,Y,'W'),
-  display_location_fact(weapon,X,Y,'X'),
-  display_location_fact(pit,X,Y,'P'),
-  display_location_fact(fire,X,Y,'F'),
-  display_location_fact(food,X,Y,'Q'),
-  write(' ').
-
-display_signals(X,Y) :-
-  agent_orientation(AO),
-  display_agent(AO,AC),
-  display_location_fact(agent_location,X,Y,AC),
-  display_location_fact(signal_enemy_tribe_position,X,Y,'t'),
-  display_location_fact(signal_enemy_position,X,Y,'e'),
-  display_location_fact(signal_wolf_position,X,Y,'w'),
-  display_location_fact(signal_weapon_position,X,Y,'x'),
-  display_location_fact(signal_pit_position,X,Y,'p'),
-  display_location_fact(signal_fire_position,X,Y,'f'),
-  display_location_fact(signal_food_position,X,Y,'q'),
+  display_known_fact(enemy_tribe,X,Y,'T'),
+  display_known_fact(enemy,X,Y,'E'),
+  display_known_fact(wolf,X,Y,'W'),
+  display_known_fact(weapon,X,Y,'X'),
+  display_known_fact(pit,X,Y,'P'),
+  display_known_fact(fire,X,Y,'F'),
+  display_known_fact(food,X,Y,'Q'),
   write(' ').
 
 display_location_fact(Functor,X,Y,Atom) :-
@@ -702,6 +778,28 @@ display_location_fact(Functor,X,Y,Atom) :-
   format('~w',[Atom]).
 
 display_location_fact(_,_,_,_) :-
+  format(' ',[]).
+
+display_signals(X,Y) :-
+  agent_orientation(AO),
+  display_agent(AO,AC),
+  display_location_fact(agent_location,X,Y,AC),
+  display_known_fact(signal_enemy_tribe,X,Y,'t'),
+  display_known_fact(signal_enemy,X,Y,'e'),
+  display_known_fact(signal_wolf,X,Y,'w'),
+  display_known_fact(signal_weapon,X,Y,'x'),
+  display_known_fact(signal_pit,X,Y,'p'),
+  display_known_fact(signal_fire,X,Y,'f'),
+  display_known_fact(signal_food,X,Y,'q'),
+  write(' ').
+
+display_known_fact(Functor,X,Y,Atom) :-
+  Fact =.. [Functor,X,Y,yes],
+  Fact,
+  !,
+  format('~w',[Atom]).
+
+display_known_fact(_,_,_,_) :-
   format(' ',[]).
 
 display_dashes(E) :-
