@@ -1,6 +1,6 @@
 % antecessor_primordial.pl
 
-%:- module(anti_pri,[initialize/2, execute/2, display_world/0, restart/1]).
+:- module(anti_pri,[initialize/1, initialize/2, execute/2, set_map_type/1, display_world/0, restart/1, resurrect_agent/1]).
 
 % Antecessor Primordial World Simulator
 %
@@ -39,29 +39,43 @@
   agent_type/1,
   agent_time_to_starve/1,
   agent_time_to_freeze/1,
-  agent_score/1]).
+  agent_time_survived/1]).
+%  agent_score/1]).
 
 :- dynamic([				% map stuff
   map_type/1]).
   
 set_map_type(Type) :- retractall(map_type(_)),assert(map_type(Type)).
-:- set_map_type(info).
+:- set_map_type(info). 		% possible values: 
+							%	info 	 - the map with every object on it but no signals,
+							%	signals  - the map with the signals seen by the agent
 
-default_world_extent(10). 		% Default size of the world is 10x10
-default_time_to_starve(6).		% Default number of rounds until the agent starves(if no food is found)
-default_time_to_freeze(4).		% Default number of rounds until the agent freezes(if no fire is found)
+default_world_extent(8). 		% Default size of the world is 8x8
+default_time_to_starve(8).		% Default number of rounds until the agent starves(if no food is found)
+default_time_to_freeze(6).		% Default number of rounds until the agent freezes(if no fire is found)
 
-enemy_tribe_probability(0.10).	% Probability that a non-(1,1) location has a enemy_tribe
-enemy_probability(0.10). 	 	% Probability that a non-(1,1) location has an enemy
-wolf_probability(0.10).   		% Probability that a non-(1,1) location has a wolf
+enemy_tribe_probability(0.04).	% Probability that a non-(1,1) location has a enemy_tribe
+enemy_probability(0.07). 	 	% Probability that a non-(1,1) location has an enemy
+wolf_probability(0.05).   		% Probability that a non-(1,1) location has a wolf
 weapon_probability(0.10). 		% Probability that a non-(1,1) location has a weapon
-pit_probability(0.10).    		% Probability that a non-(1,1) location has a pit
+pit_probability(0.07).    		% Probability that a non-(1,1) location has a pit
 fire_probability(0.10).   		% Probability that a non-(1,1) location has fire
 food_probability(0.10).   		% Probability that a non-(1,1) location has food
 
 
 % initialize(Percept,Size): initializes the Antecessor Primordial World
 % and our fearless agent and returns the Percept from square 1,1.
+
+initialize([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food]) :-
+  initialize_world(),
+  
+  random_member(Type,[tribe,individual]),
+  initialize_agent(Type),
+  
+  sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
+  
+  display_action(initialize).
+
 
 initialize([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food],Size) :-
   initialize_world(Size),
@@ -100,7 +114,7 @@ resurrect_agent([Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signa
   assert(agent_time_to_starve(Starve)),
   default_time_to_freeze(Freeze),
   assert(agent_time_to_freeze(Freeze)),
-  assert(agent_health(alive)),
+  assert(agent_health(vivo)),
   
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),
   
@@ -193,17 +207,19 @@ initialize_agent(Type) :-
   retractall(agent_type(_)),
   retractall(agent_time_to_starve(_)),
   retractall(agent_time_to_freeze(_)),
-  retractall(agent_score(_)),
+  retractall(agent_time_survived(_)),
+%  retractall(agent_score(_)),
   assert(agent_location(1,1)),
   assert(agent_orientation(0)),
-  assert(agent_health(alive)),
+  assert(agent_health(vivo)),
   assert(agent_weapon(0)),
   assert(agent_type(Type)),
   default_time_to_starve(Starve),
   assert(agent_time_to_starve(Starve)),
   default_time_to_freeze(Freeze),
   assert(agent_time_to_freeze(Freeze)),
-  assert(agent_score(0)).
+  assert(agent_time_survived(0)).
+%  assert(agent_score(0)).
 
 
 % retractall_world: Retract all Antecessor Primordial world information, except 
@@ -331,20 +347,20 @@ at_least_one_object(Object,AllSqrs,AllSqrs,ObjectRestSqrs) :-
 %             These variables are either 'yes' or 'no'.  
 
 execute(_,[no,no,no,no,no,no,no]) :-
-  agent_health(dead), !,         % agent must be alive to execute actions
+  agent_health(morto), !,         % agent must be alive to execute actions
   format("Você está morto!~n",[]).
 
 execute(goforward,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,Bump]) :-
-  decrement_score,
+%  decrement_score,
   goforward(Bump),        % update location and check for bump
   decrement_status,
   update_agent_health,    % check if agent survives movement
-  (agent_health(alive) *-> (agent_location(X,Y),agent_kills(X,Y)) ; true),
+  (agent_health(vivo) *-> (agent_location(X,Y),agent_kills(X,Y)) ; true),
   sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food),         % update rest of percept
   display_action(goforward).
 
 execute(turnleft,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,no]) :-
-  decrement_score,
+%  decrement_score,
   agent_orientation(Angle),
   NewAngle is (Angle + 90) mod 360,
   retract(agent_orientation(Angle)),
@@ -353,7 +369,7 @@ execute(turnleft,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Sign
   display_action(turnleft).
 
 execute(turnright,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,no]) :-
-  decrement_score,
+%  decrement_score,
   agent_orientation(Angle),
   NewAngle is (Angle + 270) mod 360,
   retract(agent_orientation(Angle)),
@@ -362,7 +378,7 @@ execute(turnright,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Sig
   display_action(turnright).
 
 execute(grab,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,no]) :-
-  decrement_score,
+%  decrement_score,
   get_food,
   get_weapon,
   get_fire,
@@ -374,13 +390,13 @@ execute(grab,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_p
 
 % decrement_score: subtracts one from agent_score for each move
 
-decrement_score :-
-  retract(agent_score(S)),
-  S1 is S - 1,
-  assert(agent_score(S1)).
+%decrement_score :-
+%  retract(agent_score(S)),
+%  S1 is S - 1,
+%  assert(agent_score(S1)).
 
   
-% decrement_status: subtracts one from agent_time_to_starve and agent_time_to_freeze
+% decrement_status: subtracts one from agent_time_to_starve and agent_time_to_freze and adds one to agent_time_survived
 
 decrement_status :-
   retract(agent_time_to_starve(Starve)),
@@ -392,7 +408,10 @@ decrement_status :-
       Freeze1 is Freeze - 1,
       assert(agent_time_to_freeze(Freeze1))
 	) ; true 
-  ).
+  ),
+  retract(agent_time_survived(Survived)),
+  Survived1 is Survived + 1,
+  assert(agent_time_survived(Survived1)).
 
   
 % sense(Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food):
@@ -620,7 +639,7 @@ new_location(X,Y,270,X,Y1) :-
 % update_agent_health: kills agent acording to the rules of the game
 
 update_agent_health :-
-  agent_health(alive),
+  agent_health(vivo),
   agent_location(X,Y),
   (
 	agent_dies(X,Y);
@@ -629,12 +648,14 @@ update_agent_health :-
 	agent_time_to_freeze(0)
   ),
   !,
-  retract(agent_health(alive)),
-  assert(agent_health(dead)),
-  retract(agent_score(S)),
-  S1 is S - 10000,
-  assert(agent_score(S1)),
-  format("Você acabou de morrer!~n",[]).
+  retract(agent_health(vivo)),
+  assert(agent_health(morto)),
+%  retract(agent_score(S)),
+%  S1 is S - 10000,
+%  assert(agent_score(S1)),
+  agent_time_survived(Survived),
+  format("Você acabou de morrer!~n",[]),
+  format("Você sobreviveu ~d turnos!~n",[Survived]).
 
 update_agent_health.
 
@@ -728,24 +749,26 @@ display_world :-
   agent_orientation(AA),
   agent_type(AT),
   agent_health(AH),
-  agent_time_to_freeze(ATF),
-  agent_time_to_starve(ATS),
+  agent_time_to_freeze(Freeze),
+  agent_time_to_starve(Starve),
+  agent_time_survived(Survived),
   agent_weapon(N),
   format('Orientação do agente: ~d graus~n',[AA]),
   format('Tipo do agente: ~w~n',[AT]),
   format('Saúde do agente: ~w~n',[AH]),
-  format('O agente morrerá de frio em: ~d ações(grab, goforward)~n',[ATF]),
-  format('O agente morrerá de fome em: ~d ações(grab, goforward)~n',[ATS]),
+  format('O agente já sobreviveu ~d turnos!~n',[Survived]),
+  format('O agente morrerá de frio em: ~d ações(grab, goforward)~n',[Freeze]),
+  format('O agente morrerá de fome em: ~d ações(grab, goforward)~n',[Starve]),
   format('Número de itens arma que o agente possui: ~d~n',[N]),
   format("~nLegenda:"),
   format("
-    T = Tribo de Murlocks Malvados    signal: t
-    E = Murlocks Inimigos Solitarios  signal: e
-    W = Lobo                          signal: w
-    X = Arma                          signal: x
-    P = Buraco                        signal: p
-    F = Fire                          signal: f
-    Q = Comida                        signal: q
+    T = Tribo de Murlocks Malvados    sinal: t
+    E = Murlocks Inimigos Solitarios  sinal: e
+    W = Lobo                          sinal: w
+    X = Arma                          sinal: x
+    P = Buraco                        sinal: p
+    F = Fire                          sinal: f
+    Q = Comida                        sinal: q
   ").
 
 display_rows(0,E) :-
