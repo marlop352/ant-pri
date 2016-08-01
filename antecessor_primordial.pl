@@ -332,7 +332,7 @@ at_least_one_object(Object,AllSqrs,AllSqrs,ObjectRestSqrs) :-
 
 execute(_,[no,no,no,no,no,no,no]) :-
   agent_health(dead), !,         % agent must be alive to execute actions
-  format("You are dead!~n",[]).
+  format("Você está morto!~n",[]).
 
 execute(goforward,[Signal_enemy_tribe,Signal_enemy,Signal_wolf,Signal_weapon,Signal_pit,Signal_fire,Signal_food,Bump]) :-
   decrement_score,
@@ -634,7 +634,7 @@ update_agent_health :-
   retract(agent_score(S)),
   S1 is S - 10000,
   assert(agent_score(S1)),
-  format("You just died!~n",[]).
+  format("Você acabou de morrer!~n",[]).
 
 update_agent_health.
 
@@ -648,7 +648,7 @@ get_weapon :-
   NWeapon1 is NWeapon + 1,
   retract(agent_weapon(NWeapon)),
   assert(agent_weapon(NWeapon1)),
-  format("You now have ~d weapon(s)!~n",NWeapon1),
+  format("Você agora possui ~d item(ns) de arma!~n",NWeapon1),
   retract(weapon(X,Y,_)).             %   delete weapon(X,Y) from square
 
  get_weapon.
@@ -663,7 +663,7 @@ get_food :-
   Time1 is Time + ExtraTime,
   retract(agent_time_to_starve(Time)),
   assert(agent_time_to_starve(Time1)),
-  format("You now have ~d round(s) until you starve!~n",Time1),
+  format("Você agora tem ~d ações(grab, goforward) até morrer de fome!~n",Time1),
   retract(food(X,Y,_)).             %   delete food(X,Y) from square
 
  get_food.
@@ -678,7 +678,7 @@ get_fire :-
   Time1 is Time + ExtraTime,
   retract(agent_time_to_freeze(Time)),
   assert(agent_time_to_freeze(Time1)),
-  format("You now have ~d round(s) until you freeze!~n",Time1),
+  format("Você agora tem ~d ações(grab, goforward) até morrer de frio!~n",Time1),
   retractall(fire(X,Y,_)).             %   delete fire(X,Y) from square
 
  get_fire.
@@ -726,11 +726,17 @@ display_world :-
   world_extent(E),
   display_rows(E,E),
   agent_orientation(AA),
+  agent_type(AT),
   agent_health(AH),
+  agent_time_to_freeze(ATF),
+  agent_time_to_starve(ATS),
   agent_weapon(N),
-  format('agent_orientation(~d)~n',[AA]),
-  format('agent_health(~w)~n',[AH]),
-  format('agent_weapon(~d)~n',[N]).
+  format('Orientação do agente: ~d graus~n',[AA]),
+  format('Tipo do agente: ~w~n',[AT]),
+  format('Saúde do agente: ~w~n',[AH]),
+  format('O agente morrerá de frio em: ~d ações(grab, goforward)~n',[ATF]),
+  format('O agente morrerá de fome em: ~d ações(grab, goforward)~n',[ATS]),
+  format('Número de itens arma que o agente possui: ~d~n',[N]),
 
 display_rows(0,E) :-
   !,
@@ -818,5 +824,5 @@ display_agent(270,'V').
 %   new percept generated.
 
 display_action(Action) :-
-  format("~nExecuting ~w~n",[Action]),
+%  format("~nExecutando: ~w~n",[Action]),
   display_world.
