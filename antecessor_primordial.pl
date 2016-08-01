@@ -6,7 +6,6 @@
 %
 % A Prolog implementation of the Antecessor Primordial World
 
-
 :- dynamic([				% world stuff
   world_initial_state/1,
   default_world_extent/1,
@@ -43,7 +42,8 @@
 
 :- dynamic([				% map stuff
   map_type/1]).
-  
+ 
+ %Code to gen map! 
 :- retractall(map_type(_)),assert(map_type(info)).
 
 default_world_extent(10). 		% Default size of the world is 10x10
@@ -58,6 +58,43 @@ pit_probability(0.10).    		% Probability that a non-(1,1) location has a pit
 fire_probability(0.10).   		% Probability that a non-(1,1) location has fire
 food_probability(0.10).   		% Probability that a non-(1,1) location has food
 
+%------------NSS------------------------
+
+io_sig_TS(X,Y):-
+    open('dd_map.txt', append,Stream),
+    write(Stream, 'Possible Tribe of Murlocks at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  BEWARE!!!!'), nl(Stream),
+    close(Stream).
+
+io_sig_ES(X,Y):-
+    open('dd_map.txt', append,Stream),
+    write(Stream, 'Possible Murlock Fighter at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  BEWARE!!!!'), nl(Stream),
+    close(Stream).
+
+io_sig_H(X,Y):-
+    open('dd_map.txt', append,Stream),
+    write(Stream, 'Possible Wolf at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  BEWARE!!!!'), nl(Stream),
+    close(Stream).
+
+io_sig_B(X,Y):-
+    open('dd_map.txt', append,Stream),
+    write(Stream, 'Possible Hole at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  Dont fall in!'), nl(Stream),
+    close(Stream).
+
+io_sig_S(X,Y):-
+    open('dd_map.txt', append,Stream),
+    write(Stream, 'There might be food at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, '  Yummy!'), nl(Stream),
+    close(Stream).
+
+io_sig_F(X,Y):-
+    open('dd_map.txt', append,Stream),
+    write(Stream, 'Possible fire at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, ' . Tosty...'), nl(Stream),
+    close(Stream).
+
+io_sig_X(X,Y):-
+    open('dd_map.txt', append,Stream),
+    write(Stream, 'Possible rifle at X: '),write(Stream, X),write(Stream, ' Y:'), write(Stream, Y), write(Stream, ' . Piu piu!'), nl(Stream),
+    close(Stream).
+%-------------------------------------------
 
 % initialize(Percept,Size): initializes the Antecessor Primordial World
 % and our fearless agent and returns the Percept from square 1,1.
@@ -397,6 +434,12 @@ signal_enemy_tribe(yes) :-
 
 signal_enemy_tribe(no).
 
+% if_sigTS
+if_sigT(yes) :- 
+    signal_enemy_tribe(yes),
+    agent_location(X,Y),
+    io_sig_TS(X,Y).
+
 
 % signal_enemy(Signal_enemy): Signal_enemy = yes if a enemy is in a square directly up, down,
 %   left, or right of the current agent location.
@@ -417,6 +460,10 @@ signal_enemy(yes) :-
 
 signal_enemy(no).
 
+if_sigE(yes) :- 
+    signal_enemy(yes),
+    agent_location(X,Y),
+    io_sig_ES(X,Y).
 
 % signal_wolf(Signal_wolf): Signal_wolf = yes if a wolf is in a square directly up, down,
 %   left, or right of the current agent location.
@@ -437,6 +484,10 @@ signal_wolf(yes) :-
 
 signal_wolf(no).
 
+if_sigW(yes) :- 
+    signal_wolf(yes),
+    agent_location(X,Y),
+    io_sig_H(X,Y).
 
 % signal_weapon(Signal_weapon): Signal_weapon = yes if a weapon is in a square directly up, down,
 %   left, or right of the current agent location.
@@ -449,6 +500,10 @@ signal_weapon(yes) :-
 
 signal_weapon(no).
 
+if_sigX(yes) :- 
+    signal_weapon(yes),
+    agent_location(X,Y),
+    io_sig_X(X,Y).
 
 % signal_pit(Signal_pit): Signal_pit = yes if a pit is in a square directly up, down,
 %   left, or right of the current agent location.
@@ -469,6 +524,10 @@ signal_pit(yes) :-
 
 signal_pit(no).
 
+if_sigP(yes) :- 
+    signal_pit(yes),
+    agent_location(X,Y),
+    io_sig_B(X,Y).
 
 % signal_fire(Signal_fire): Signal_fire = yes if a fire is in a square directly up, down,
 %   left, or right of the current agent location.
@@ -482,6 +541,11 @@ signal_fire(yes) :-
 signal_fire(no).
 
 
+if_sigF(yes) :- 
+    signal_pit(yes),
+    agent_location(X,Y),
+    io_sig_F(X,Y).
+
 % signal_food(Signal_food): Signal_food = yes if a food is in a square directly up, down,
 %   left, or right of the current agent location.
 
@@ -493,6 +557,10 @@ signal_food(yes) :-
 
 signal_food(no).
 
+if_sigQ(yes) :- 
+    signal_food(yes),
+    agent_location(X,Y),
+    io_sig_S(X,Y).
 
 % goforward(Bump): Attempts to move agent forward one unit along
 %   its current orientation.
@@ -640,7 +708,9 @@ display_world :-
   agent_weapon(N),
   format('agent_orientation(~d)~n',[AA]),
   format('agent_health(~w)~n',[AH]),
-  format('agent_weapon(~d)~n',[N]).
+  format('agent_weapon(~d)~n',[N]),
+  format("~nLegenda: ~n"),
+  format("T = Tribo de Murlocks Malvados  ~nE = Murlocks Inimigos Solitarios  ~nW = Lobo ~nX = Arma  ~nP = Buraco ~nF = Fire ~nQ = Comida~n").
 
 display_rows(0,E) :-
   !,
@@ -721,3 +791,5 @@ display_agent(270,'V').
 display_action(Action) :-
   format("~nExecuting ~w~n",[Action]),
   display_world.
+
+
