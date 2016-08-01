@@ -212,13 +212,13 @@ initialize_agent(Type) :-
 retractall_world :-
   retractall(world_extent(_)),
   retractall(world_cold(_)),
-  retractall(enemy_tribe(_,_)),
-  retractall(enemy(_,_)),
-  retractall(wolf(_,_)),
-  retractall(weapon(_,_)),
-  retractall(pit(_,_)),
-  retractall(fire(_,_)),
-  retractall(food(_,_)).
+  retractall(enemy_tribe(_,_,_)),
+  retractall(enemy(_,_,_)),
+  retractall(wolf(_,_,_)),
+  retractall(weapon(_,_,_)),
+  retractall(pit(_,_,_)),
+  retractall(fire(_,_,_)),
+  retractall(food(_,_,_)).
 
 
 % retractall_signal: Retract all Antecessor Primordial signal information.
@@ -824,5 +824,5 @@ display_agent(270,'V').
 %   new percept generated.
 
 display_action(Action) :-
-%  format("~nExecutando: ~w~n",[Action]),
+  format("~nExecutando: ~w~n",[Action]),
   display_world.
