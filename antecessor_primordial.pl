@@ -23,7 +23,7 @@
   food/3]).
 
 :- dynamic([				% known signals stuff
-  signal_enemy/3,
+  signal_enemy_tribe/3,
   signal_enemy/3,
   signal_wolf/3,
   signal_weapon/3,
